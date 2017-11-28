@@ -8,10 +8,8 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-```
-# Run animation of a simulation run
-python main.py
+Run the following command to get a list of all possible commands:
 
-# Export animation to GIF
-python main.py --export
+```commandline
+python main.py -h
 ```
