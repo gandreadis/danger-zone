@@ -1,10 +1,11 @@
 import pyglet
 
+from danger_zone.parameters import MAP_WIDTH, MAP_HEIGHT
 
-# noinspection PyAbstractClass
+
 class WindowController(pyglet.window.Window):
     def __init__(self, simulation):
-        super().__init__(width=512, height=512)
+        super().__init__(width=MAP_WIDTH, height=MAP_HEIGHT)
 
         self.simulation = simulation
         pyglet.clock.schedule_interval(self.update, 1 / 30)
