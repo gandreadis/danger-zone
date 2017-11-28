@@ -6,3 +6,12 @@ Make sure to have Python 3 (and PIP) installed. Once those are ready, run the fo
 ```commandline
 pip install -r requirements.txt
 ```
+
+## Usage
+```
+# Run animation of a simulation run
+python main.py
+
+# Export animation to GIF
+python main.py --export
+```

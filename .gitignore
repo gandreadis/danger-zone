@@ -106,3 +106,7 @@ venv.bak/
 
 ## PyCharm
 .idea/
+
+## danger-zone
+gif_frames/
+danger-zone-export.gif

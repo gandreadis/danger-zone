@@ -4,12 +4,15 @@ from danger_zone.parameters import MAP_WIDTH, MAP_HEIGHT
 
 
 class WindowController(pyglet.window.Window):
-    def __init__(self, simulation):
+    def __init__(self, simulation, gif_exporter=None):
         super().__init__(width=MAP_WIDTH, height=MAP_HEIGHT)
 
         self.simulation = simulation
+        self.gif_exporter = gif_exporter
+
         pyglet.clock.schedule_interval(self.update, 1 / 30)
 
+    # noinspection PyMethodOverriding
     def on_draw(self):
         self.clear()
         # TODO draw map background
@@ -17,6 +20,10 @@ class WindowController(pyglet.window.Window):
 
     def update(self, dt):
         self.simulation.on_tick()
+
+        if self.gif_exporter and not self.gif_exporter.save_frame():
+            self.gif_exporter.export()
+            self.close()
 
     def draw_agents(self):
         for agent in self.simulation.agents:
