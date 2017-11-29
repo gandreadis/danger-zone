@@ -19,6 +19,9 @@ class GifExporter:
             shutil.rmtree(GifExporter.FRAME_DIRECTORY)
 
     def save_frame(self):
+        if not os.path.exists(GifExporter.FRAME_DIRECTORY):
+            return
+
         image_path = os.path.join(GifExporter.FRAME_DIRECTORY, 'frame-{}.png'.format(self.current_frame))
         pyglet.image.get_buffer_manager().get_color_buffer().save(image_path)
 
