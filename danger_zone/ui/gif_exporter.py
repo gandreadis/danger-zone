@@ -14,7 +14,7 @@ class GifExporter:
         self.file_names = []
 
         if not os.path.exists(GifExporter.FRAME_DIRECTORY):
-            os.makedirs(GifExporter.FRAME_DIRECTORY)
+            os.mkdir(GifExporter.FRAME_DIRECTORY)
         else:
             shutil.rmtree(GifExporter.FRAME_DIRECTORY)
 

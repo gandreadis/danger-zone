@@ -1,12 +1,12 @@
 import numpy as np
 
-from danger_zone.parameters import TARGET_DELTA
+from danger_zone.parameters import TARGET_DELTA, MAP_WIDTH, MAP_HEIGHT
 from danger_zone.util.vector_calculation import normalize, limit_length
 
 
 class TrafficAgent:
     def __init__(self):
-        self.position = np.array([0.0, 0.0])
+        self.position = np.array([MAP_WIDTH / 2.0, -10.0])
         self.velocity = np.array([0.0, 0.0])
         self.acceleration = np.array([0.0, 0.0])
         self.has_reached_target = False
@@ -16,7 +16,7 @@ class TrafficAgent:
         self.movement_randomness = 5
         self.width = 10
         self.height = 10
-        self.target = np.array([500.0, 500.0])
+        self.target = np.array([MAP_WIDTH / 2.0, MAP_HEIGHT + 10.0])
 
     def move(self):
         if self.has_reached_target:

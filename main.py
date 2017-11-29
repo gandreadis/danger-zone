@@ -14,10 +14,10 @@ def main():
     args = parser.parse_args()
 
     if args.num_frames:
-        WindowController(Simulation(), GifExporter(args.num_frames))
+        WindowController(Simulation('simple'), GifExporter(args.num_frames))
         pyglet.app.run()
     else:
-        WindowController(Simulation())
+        WindowController(Simulation('simple'))
         pyglet.app.run()
 
 

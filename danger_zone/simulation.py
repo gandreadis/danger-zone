@@ -1,14 +1,59 @@
-from danger_zone.models.bicycle import Bicycle
-from danger_zone.models.pedestrian import Pedestrian
+import numpy as np
+
+from danger_zone.parameters import MAP_HEIGHT
+from danger_zone.util.traffic_agent_types import TRAFFIC_AGENT_TYPES
 
 
 class Simulation:
-    def __init__(self):
-        self.agents = [Pedestrian(), Pedestrian(), Bicycle()]
+    SCENARIOS = {
+        "simple": {
+            "spawn-delay": {
+                "pedestrian": 8,
+                "bicycle": 15,
+                "car": 40,
+            },
+            "spawn-area": {
+                "pedestrian": {"x": 0, "y": -50, "width": 150, "height": 50},
+                "bicycle": {"x": 150, "y": -200, "width": 150, "height": 100},
+                "car": {"x": 300, "y": -300, "width": 200, "height": 150},
+            },
+            "target-area": {
+                "pedestrian": {"x": 0, "y": MAP_HEIGHT, "width": 150, "height": 50},
+                "bicycle": {"x": 150, "y": MAP_HEIGHT, "width": 150, "height": 100},
+                "car": {"x": 300, "y": MAP_HEIGHT, "width": 200, "height": 150},
+            },
+        }
+    }
+
+    def __init__(self, scenario):
+        self.scenario = scenario
+        self.agents = []
         self.tick = 0
 
     def on_tick(self):
+        self.tick += 1
+        self.spawn_agents("pedestrian")
+        self.spawn_agents("bicycle")
+        self.spawn_agents("car")
+
         for agent in self.agents:
             agent.move()
 
-        self.tick += 1
+            if agent.has_reached_target:
+                self.agents.remove(agent)
+
+    def spawn_agents(self, type):
+        # noinspection PyTypeChecker
+        if self.tick % Simulation.SCENARIOS[self.scenario]["spawn-delay"][type] == 0:
+            agent = TRAFFIC_AGENT_TYPES[type]()
+            agent.position = self.select_random_point_in_rectangle(
+                Simulation.SCENARIOS[self.scenario]["spawn-area"][type])
+            agent.target = self.select_random_point_in_rectangle(
+                Simulation.SCENARIOS[self.scenario]["target-area"][type])
+            self.agents.append(agent)
+
+    def select_random_point_in_rectangle(self, rect):
+        random_point = np.random.rand(2)
+        random_point *= np.array([rect["width"], rect["height"]])
+        random_point += np.array([rect["x"], rect["y"]])
+        return random_point

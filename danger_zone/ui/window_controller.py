@@ -16,15 +16,14 @@ class WindowController(pyglet.window.Window):
     # noinspection PyMethodOverriding
     def on_draw(self):
         self.clear()
-        # TODO draw map background
         self.draw_agents()
 
     def update(self, dt):
         self.simulation.on_tick()
 
         if self.gif_exporter and not self.gif_exporter.save_frame():
-            self.gif_exporter.export()
             self.close()
+            self.gif_exporter.export()
 
     def draw_agents(self):
         for agent in self.simulation.agents:
