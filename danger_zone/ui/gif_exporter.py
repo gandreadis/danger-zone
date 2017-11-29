@@ -29,6 +29,8 @@ class GifExporter:
         return self.current_frame <= self.num_frames
 
     def export(self):
+        print('Exporting GIF...')
+
         images = []
         for file_name in self.file_names:
             images.append(imageio.imread(file_name))

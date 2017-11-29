@@ -1,9 +1,10 @@
-from danger_zone.models.traffic_agent import TrafficAgent
+from danger_zone.models.bicycle import Bicycle
+from danger_zone.models.pedestrian import Pedestrian
 
 
 class Simulation:
     def __init__(self):
-        self.agents = [TrafficAgent()]
+        self.agents = [Pedestrian(), Pedestrian(), Bicycle()]
         self.tick = 0
 
     def on_tick(self):
