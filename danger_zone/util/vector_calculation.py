@@ -12,11 +12,12 @@ def limit_length(np_array, max_length):
         return np_array
 
 
-def angle_between(p1, p2):
-    ang1 = np.arctan2(*p1[::-1])
-    ang2 = np.arctan2(*p2[::-1])
-    return np.rad2deg((ang1 - ang2) % (2 * np.pi))
+def calculate_angle_between(p1, p2):
+    angle_1 = np.arctan2(*p1[::-1])
+    angle_2 = np.arctan2(*p2[::-1])
+
+    return np.rad2deg((angle_1 - angle_2) % (2 * np.pi))
 
 
 def get_vector_angle(np_array):
-    return angle_between(np.array([0, 1]), np_array)
+    return calculate_angle_between(np.array([0, 1]), np_array)
