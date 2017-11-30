@@ -1,24 +1,24 @@
 import numpy as np
 
-from danger_zone.parameters import MAP_HEIGHT
+from danger_zone.parameters import MAP_HEIGHT, PERCEPTION_DELAY
 from danger_zone.util.traffic_agent_types import TRAFFIC_AGENT_TYPES
 
 SCENARIOS = {
     "simple": {
         "spawn-delay": {
-            "pedestrian": 10,
-            "bicycle": 20,
-            "car": 40,
+            "pedestrian": 15,
+            "bicycle": 25,
+            "car": 50,
         },
         "spawn-area": {
-            "pedestrian": {"x": 0, "y": -50, "width": 150, "height": 50},
-            "bicycle": {"x": 150, "y": -200, "width": 150, "height": 100},
-            "car": {"x": 300, "y": -300, "width": 200, "height": 150},
+            "pedestrian": {"x": 0, "y": -50, "width": 120, "height": 50},
+            "bicycle": {"x": 170, "y": -200, "width": 130, "height": 100},
+            "car": {"x": 320, "y": -300, "width": 180, "height": 150},
         },
         "target-area": {
-            "pedestrian": {"x": 0, "y": MAP_HEIGHT, "width": 150, "height": 50},
-            "bicycle": {"x": 150, "y": MAP_HEIGHT, "width": 150, "height": 100},
-            "car": {"x": 300, "y": MAP_HEIGHT, "width": 200, "height": 150},
+            "pedestrian": {"x": 0, "y": MAP_HEIGHT + 20, "width": 150, "height": 50},
+            "bicycle": {"x": 170, "y": MAP_HEIGHT + 20, "width": 130, "height": 100},
+            "car": {"x": 320, "y": MAP_HEIGHT + 20, "width": 180, "height": 150},
         },
     }
 }
@@ -38,8 +38,10 @@ class Simulation:
         self.spawn_agents("car")
 
         for agent in self.agents:
-            agent.separate_from_other_agents(self.agents, self.record_collision)
-            agent.align(self.agents)
+            if self.tick % PERCEPTION_DELAY == 0:
+                agent.separate_from_other_agents(self.agents, self.record_collision)
+                agent.align(self.agents)
+
             agent.move()
 
             if agent.has_reached_target:
@@ -48,8 +50,8 @@ class Simulation:
     def record_collision(self):
         self.collision_counter += 1
 
+    # noinspection PyTypeChecker
     def spawn_agents(self, type):
-        # noinspection PyTypeChecker
         if self.tick % SCENARIOS[self.scenario]["spawn-delay"][type] == 0:
             agent = TRAFFIC_AGENT_TYPES[type]()
             agent.position = self.select_random_point_in_rectangle(

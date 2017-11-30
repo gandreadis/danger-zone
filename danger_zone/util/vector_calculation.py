@@ -19,5 +19,8 @@ def calculate_angle_between(p1, p2):
     return np.rad2deg((angle_1 - angle_2) % (2 * np.pi))
 
 
+REFERENCE_VECTOR = np.array([0, 1])
+
+
 def get_vector_angle(np_array):
-    return calculate_angle_between(np.array([0, 1]), np_array)
+    return calculate_angle_between(REFERENCE_VECTOR, np_array)

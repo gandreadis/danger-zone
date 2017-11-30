@@ -17,6 +17,7 @@ class TrafficAgent:
         self.max_speed = 2
         self.max_steering_force = 0.1
         self.movement_randomness = 5
+        self.max_acceleration = 1
         self.width = 10
         self.height = 10
         self.target = np.array([MAP_WIDTH / 2.0, MAP_HEIGHT + 10.0])
@@ -49,7 +50,7 @@ class TrafficAgent:
             separation_sum /= num_close_agents
             separation_sum = normalize(separation_sum) * self.max_speed
             steering_force = separation_sum - self.velocity
-            limit_length(steering_force * 1.5, self.max_steering_force)
+            limit_length(steering_force * 3, self.max_steering_force)
             self.acceleration += steering_force
 
     def align(self, agents):
@@ -78,6 +79,7 @@ class TrafficAgent:
 
         self.calculate_target_force()
 
+        self.acceleration = limit_length(self.acceleration, self.max_acceleration)
         self.velocity += self.acceleration
         self.velocity = limit_length(self.velocity, self.max_speed)
         self.position += self.velocity
