@@ -37,3 +37,6 @@ AGENT_VISIBILITY_RANGE = 50
 
 # Tick Parameters
 PERCEPTION_DELAY = 3
+
+# Simulation Parameters
+DEFAULT_TIME_LIMIT = 300

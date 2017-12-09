@@ -25,6 +25,10 @@ class WindowController(pyglet.window.Window):
             self.close()
             self.gif_exporter.export()
 
+        if self.simulation.tick == self.simulation.max_tick:
+            print('Simulation completed with %s collisions.' % self.simulation.collision_counter)
+            self.close()
+
     def draw_agents(self):
         for agent in self.simulation.agents:
             self.draw_agent(agent)

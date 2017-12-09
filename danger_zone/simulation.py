@@ -25,11 +25,12 @@ SCENARIOS = {
 
 
 class Simulation:
-    def __init__(self, scenario):
+    def __init__(self, scenario, limit):
         self.scenario = scenario
         self.agents = []
         self.tick = 0
         self.collision_counter = 0
+        self.max_tick = limit
 
     def on_tick(self):
         self.tick += 1
