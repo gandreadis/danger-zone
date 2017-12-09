@@ -34,7 +34,6 @@ class Simulation:
 
     def on_tick(self):
         self.tick += 1
-        # print(self.tick)
         self.spawn_agents("pedestrian")
         self.spawn_agents("bicycle")
         self.spawn_agents("car")
