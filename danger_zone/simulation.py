@@ -25,16 +25,16 @@ SCENARIOS = {
 
 
 class Simulation:
-    def __init__(self, scenario,limit) :
+    def __init__(self, scenario, limit):
         self.scenario = scenario
         self.agents = []
         self.tick = 0
         self.collision_counter = 0
-        self.maxtick = limit
+        self.max_tick = limit
 
     def on_tick(self):
         self.tick += 1
-        #print(self.tick)
+        # print(self.tick)
         self.spawn_agents("pedestrian")
         self.spawn_agents("bicycle")
         self.spawn_agents("car")
