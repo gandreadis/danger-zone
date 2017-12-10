@@ -27,6 +27,7 @@ class WindowController(pyglet.window.Window):
 
         if self.simulation.tick == self.simulation.max_tick:
             print('Simulation completed with %s collisions.' % self.simulation.collision_counter)
+            print('%s bicycles, %s pedestrians, and %s cars reached their targets, for a total of %s successes.' % (self.simulation.bicycles_through, self.simulation.pedestrians_through, self.simulation.cars_through, (self.simulation.bicycles_through + self.simulation.pedestrians_through + self.simulation.cars_through)))
             self.close()
 
     def draw_agents(self):
