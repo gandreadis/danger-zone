@@ -38,7 +38,6 @@ class Simulation:
         self.tick = 0
         self.collision_counter = 0
         self.max_tick = limit
-        self.targets_reached = 0
         self.pedestrians_through = 0
         self.bicycles_through = 0
         self.cars_through = 0
