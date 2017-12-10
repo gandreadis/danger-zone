@@ -29,7 +29,7 @@ class GifExporter:
 
         self.current_frame += 1
 
-        return self.current_frame <= self.num_frames
+        return self.current_frame < self.num_frames
 
     def export(self):
         print('Exporting GIF...')

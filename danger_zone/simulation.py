@@ -6,19 +6,23 @@ from danger_zone.util.traffic_agent_types import TRAFFIC_AGENT_TYPES
 SCENARIOS = {
     "simple": {
         "spawn-delay": {
-            "pedestrian": 15,
-            "bicycle": 25,
-            "car": 50,
+            "pedestrian": 40,
+            "bicycle": 40,
+            "car": 80,
         },
-        "spawn-area": {
-            "pedestrian": {"x": 0, "y": -50, "width": 120, "height": 50},
-            "bicycle": {"x": 170, "y": -200, "width": 130, "height": 100},
-            "car": {"x": 320, "y": -300, "width": 180, "height": 150},
-        },
-        "target-area": {
-            "pedestrian": {"x": 0, "y": MAP_HEIGHT + 20, "width": 150, "height": 50},
-            "bicycle": {"x": 170, "y": MAP_HEIGHT + 20, "width": 130, "height": 100},
-            "car": {"x": 320, "y": MAP_HEIGHT + 20, "width": 180, "height": 150},
+        "areas": {
+            "pedestrian": [
+                {"x": 0, "y": -50, "width": 120, "height": 50},
+                {"x": 0, "y": MAP_HEIGHT + 20, "width": 150, "height": 50},
+            ],
+            "bicycle": [
+                {"x": 170, "y": -200, "width": 130, "height": 100},
+                {"x": 170, "y": MAP_HEIGHT + 20, "width": 130, "height": 100},
+            ],
+            "car": [
+                {"x": 320, "y": -300, "width": 180, "height": 150},
+                {"x": 320, "y": MAP_HEIGHT + 20, "width": 180, "height": 150},
+            ]
         },
     }
 }
@@ -51,14 +55,16 @@ class Simulation:
     def record_collision(self):
         self.collision_counter += 1
 
-    # noinspection PyTypeChecker
+    # noinspection PyTypeChecker,PyUnresolvedReferences
     def spawn_agents(self, type):
         if self.tick % SCENARIOS[self.scenario]["spawn-delay"][type] == 0:
             agent = TRAFFIC_AGENT_TYPES[type]()
-            agent.position = self.select_random_point_in_rectangle(
-                SCENARIOS[self.scenario]["spawn-area"][type])
-            agent.target = self.select_random_point_in_rectangle(
-                SCENARIOS[self.scenario]["target-area"][type])
+            type_areas = SCENARIOS[self.scenario]["areas"][type]
+            spawn_index = np.random.randint(0, len(type_areas))
+            target_index = (spawn_index + 1) % len(type_areas)
+
+            agent.position = self.select_random_point_in_rectangle(type_areas[spawn_index])
+            agent.target = self.select_random_point_in_rectangle(type_areas[target_index])
             agent.cache_shape()
             self.agents.append(agent)
 
