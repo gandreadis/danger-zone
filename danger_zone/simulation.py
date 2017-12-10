@@ -2,6 +2,9 @@ import numpy as np
 
 from danger_zone.parameters import MAP_HEIGHT, PERCEPTION_DELAY
 from danger_zone.util.traffic_agent_types import TRAFFIC_AGENT_TYPES
+from danger_zone.models.bicycle import Bicycle
+from danger_zone.models.car import Car
+from danger_zone.models.pedestrian import Pedestrian
 
 SCENARIOS = {
     "simple": {
@@ -35,6 +38,10 @@ class Simulation:
         self.tick = 0
         self.collision_counter = 0
         self.max_tick = limit
+        self.targets_reached = 0
+        self.pedestrians_through = 0
+        self.bicycles_through = 0
+        self.cars_through = 0
 
     def on_tick(self):
         self.tick += 1
@@ -51,6 +58,12 @@ class Simulation:
 
             if agent.has_reached_target:
                 self.agents.remove(agent)
+                if isinstance(agent, Pedestrian):
+                    self.pedestrians_through += 1
+                if isinstance(agent, Bicycle):
+                    self.bicycles_through +=1
+                if isinstance(agent, Car):
+                    self.cars_through +=1
 
     def record_collision(self):
         self.collision_counter += 1
