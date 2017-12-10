@@ -20,10 +20,10 @@ def main():
         print('Running simulation for %s ticks.' % args.time_limit)
         WindowController(Simulation('simple', args.time_limit))
     elif not args.time_limit and args.should_export_gif:
-        print('Running simulation for default number of ticks, then exporting GIF file.')
+        print('Running simulation for the default number of ticks, then exporting GIF file.')
         WindowController(Simulation('simple', DEFAULT_TIME_LIMIT), GifExporter(DEFAULT_TIME_LIMIT))
     elif not args.time_limit and not args.should_export_gif:
-        print('Running simulation for default number of ticks.')
+        print('Running simulation for the default number of ticks.')
         WindowController(Simulation('simple', DEFAULT_TIME_LIMIT))
     pyglet.app.run()
 
