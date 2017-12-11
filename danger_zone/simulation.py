@@ -1,10 +1,11 @@
 import numpy as np
 
-from danger_zone.parameters import MAP_HEIGHT, PERCEPTION_DELAY
-from danger_zone.util.traffic_agent_types import TRAFFIC_AGENT_TYPES
 from danger_zone.models.bicycle import Bicycle
 from danger_zone.models.car import Car
 from danger_zone.models.pedestrian import Pedestrian
+from danger_zone.parameters import MAP_HEIGHT, PERCEPTION_DELAY
+from danger_zone.scenario import Scenario
+from danger_zone.util.traffic_agent_types import TRAFFIC_AGENT_TYPES
 
 SCENARIOS = {
     "simple": {
@@ -29,6 +30,9 @@ SCENARIOS = {
         },
     }
 }
+
+test = Scenario('simple')
+test.read_from_file()
 
 
 class Simulation:
@@ -60,7 +64,7 @@ class Simulation:
                 if isinstance(agent, Pedestrian):
                     self.pedestrians_through += 1
                 if isinstance(agent, Bicycle):
-                    self.bicycles_through +=1
+                    self.bicycles_through += 1
                 if isinstance(agent, Car):
                     self.cars_through +=1
 
