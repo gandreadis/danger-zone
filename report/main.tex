@@ -9,7 +9,14 @@
   {\normalfont\Huge\bfseries}{\thechapter}{1em}{}
 \titlespacing*{\chapter}{0pt}{0ex}{2.3ex plus .2ex}
 
-% TODO: Full title
+% Hyperlinks
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+
+% For notes on what we still need to do - add as many (or little) as you like
+\usepackage[prependcaption]{todonotes}
+\newcommand{\TODO}{\todo[inline]}
+
 \title{Danger Zone}
 \author{
     Georgios Andreadis, Jackson Matlak,\\
@@ -28,6 +35,7 @@
 	{\scshape\Large Collective Intelligence\par}
     \vspace{5cm}
 
+    \TODO{Add full report title}
 	{\huge\bfseries \thetitle \par}
     \par\vspace{1cm}
 	{\Large\itshape \theauthor \par}
@@ -36,6 +44,8 @@
 
 	{\large \thedate \par}
 \end{titlepage}
+
+\listoftodos
 
 \input{chapters/0-abstract.tex}
 \tableofcontents
