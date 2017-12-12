@@ -6,6 +6,7 @@ from danger_zone.parameters import PEDESTRIAN_WIDTH, PEDESTRIAN_HEIGHT, PEDESTRI
 class Pedestrian(TrafficAgent):
     def __init__(self):
         super().__init__()
+        self.name = 'pedestrian'
         self.width = PEDESTRIAN_WIDTH
         self.height = PEDESTRIAN_HEIGHT
         self.max_speed = PEDESTRIAN_MAX_SPEED

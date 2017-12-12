@@ -6,6 +6,7 @@ from danger_zone.parameters import BICYCLE_HEIGHT, BICYCLE_WIDTH, \
 class Bicycle(TrafficAgent):
     def __init__(self):
         super().__init__()
+        self.name = 'bicycle'
         self.width = BICYCLE_WIDTH
         self.height = BICYCLE_HEIGHT
         self.max_speed = BICYCLE_MAX_SPEED

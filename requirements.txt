@@ -2,3 +2,4 @@ numpy
 pyglet
 imageio
 shapely
+Pillow
