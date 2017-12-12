@@ -1,15 +1,30 @@
 import os
 
+import numpy as np
 from PIL import Image
 
-from danger_zone.parameters import IMAGE_HEIGHT, IMAGE_WIDTH
+from danger_zone.parameters import IMAGE_HEIGHT, IMAGE_WIDTH, SPAWN_AREA_WIDTH
 from danger_zone.tile import Tile
 
 
 class Scenario:
+    SEARCH_AREAS = [
+        [SPAWN_AREA_WIDTH, 0, IMAGE_WIDTH - SPAWN_AREA_WIDTH, SPAWN_AREA_WIDTH],  # N
+        [0, SPAWN_AREA_WIDTH, SPAWN_AREA_WIDTH, IMAGE_HEIGHT - SPAWN_AREA_WIDTH],  # E
+        [SPAWN_AREA_WIDTH, IMAGE_HEIGHT - SPAWN_AREA_WIDTH, IMAGE_WIDTH - SPAWN_AREA_WIDTH, IMAGE_HEIGHT],  # S
+        [IMAGE_WIDTH - SPAWN_AREA_WIDTH, SPAWN_AREA_WIDTH, IMAGE_WIDTH, IMAGE_HEIGHT - SPAWN_AREA_WIDTH],  # W
+    ]
+
     def __init__(self, name):
         self.name = name
-        self.pixels = ''
+        self.image_file_name = os.path.join('maps', self.name + '.png')
+        self.image_data = None
+        self.areas = [
+            {"car": [], "bicycle": [], "pedestrian": []},  # N
+            {"car": [], "bicycle": [], "pedestrian": []},  # E
+            {"car": [], "bicycle": [], "pedestrian": []},  # S
+            {"car": [], "bicycle": [], "pedestrian": []},  # W
+        ]
 
     def read_from_file(self):
         img = Image.open(os.path.join('maps', self.name + '.png'))
@@ -18,11 +33,21 @@ class Scenario:
         width, height = img.size
         assert width == IMAGE_WIDTH and height == IMAGE_HEIGHT, 'Image should have standard map dimensions'
 
-        pixel_data = list(img.getdata())
-        for pixel in pixel_data:
-            self.pixels += Tile.from_rgb(pixel)
+        image_data_raw = np.array(list(img.getdata()))
+        self.image_data = np.reshape(image_data_raw, (-1, IMAGE_WIDTH, 3))
 
         img.close()
 
     def get_tile(self, x, y):
-        return self.pixels[y * IMAGE_WIDTH + x]
+        return Tile.from_rgb(self.image_data[y, x])
+
+    def detect_areas(self):
+        for search_area_index in range(len(Scenario.SEARCH_AREAS)):
+            search_area = Scenario.SEARCH_AREAS[search_area_index]
+
+            for x in range(search_area[0], search_area[2]):
+                for y in range(search_area[1], search_area[3]):
+
+                    tile = self.get_tile(x, y)
+                    if tile in (Tile.CAR, Tile.BICYCLE, Tile.PEDESTRIAN):
+                        self.areas[search_area_index][Tile.to_type_string(tile)].append((x, y))

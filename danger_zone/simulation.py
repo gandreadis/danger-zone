@@ -33,6 +33,7 @@ SCENARIOS = {
 
 test = Scenario('simple')
 test.read_from_file()
+test.detect_areas()
 
 
 class Simulation:
@@ -73,9 +74,9 @@ class Simulation:
 
     # noinspection PyTypeChecker,PyUnresolvedReferences
     def spawn_agents(self, type):
-        if self.tick % SCENARIOS[self.scenario]["spawn-delay"][type] == 0:
+        if self.tick % SCENARIOS[self.scenario.name]["spawn-delay"][type] == 0:
             agent = TRAFFIC_AGENT_TYPES[type]()
-            type_areas = SCENARIOS[self.scenario]["areas"][type]
+            type_areas = SCENARIOS[self.scenario.name]["areas"][type]
             spawn_index = np.random.randint(0, len(type_areas))
             target_index = (spawn_index + 1) % len(type_areas)
 
