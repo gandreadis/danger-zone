@@ -21,6 +21,7 @@ def main():
     total_cars_through = 0
     print('Running %s simulations...' % args.runs)
     for run_number in range(1, args.runs + 1):
+        print('- - - - - - - - - - - - - - - - - - - - - - - - - - -')
         print('      Run number %s:' % run_number)
         if args.time_limit and args.should_export_gif:
             print('Running simulation for %s ticks, then exporting GIF file.' % args.time_limit)
@@ -41,6 +42,8 @@ def main():
         total_pedestrians_through += window.simulation.pedestrians_through
         total_cars_through += window.simulation.cars_through
 
+    print('- - - - - - - - - - - - - - - - - - - - - - - - - - -')
+    print('      Results:')
     print('An average of %s bicycles reached their target.' % (total_bicycles_through/args.runs))
     print('An average of %s pedestrians reached their target.' % (total_pedestrians_through/args.runs))
     print('An average of %s cars reached their target.' % (total_cars_through/args.runs))
