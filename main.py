@@ -3,7 +3,7 @@ import argparse
 import pyglet
 
 from danger_zone.parameters import DEFAULT_TIME_LIMIT
-from danger_zone.scenario import Scenario
+from danger_zone.setups import SETUPS
 from danger_zone.simulation import Simulation
 from danger_zone.ui.gif_exporter import GifExporter
 from danger_zone.ui.window_controller import WindowController
@@ -24,17 +24,18 @@ def main():
         print('      Run number %s:' % run_number)
         if args.time_limit and args.should_export_gif:
             print('Running simulation for %s ticks, then exporting GIF file.' % args.time_limit)
-            window = WindowController(Simulation(Scenario('simple'), args.time_limit), GifExporter(args.time_limit))
+            window = WindowController(Simulation(SETUPS["simple-sparse"], args.time_limit),
+                                      GifExporter(args.time_limit))
         elif args.time_limit and not args.should_export_gif:
             print('Running simulation for %s ticks.' % args.time_limit)
-            window = WindowController(Simulation(Scenario('simple'), args.time_limit))
+            window = WindowController(Simulation(SETUPS["simple-sparse"], args.time_limit))
         elif not args.time_limit and args.should_export_gif:
             print('Running simulation for the default number of ticks, then exporting GIF file.')
-            window = WindowController(Simulation(Scenario('simple'), DEFAULT_TIME_LIMIT),
+            window = WindowController(Simulation(SETUPS["simple-sparse"], DEFAULT_TIME_LIMIT),
                                       GifExporter(DEFAULT_TIME_LIMIT))
         elif not args.time_limit and not args.should_export_gif:
             print('Running simulation for the default number of ticks.')
-            window = WindowController(Simulation(Scenario('simple'), DEFAULT_TIME_LIMIT))
+            window = WindowController(Simulation(SETUPS["simple-sparse"], DEFAULT_TIME_LIMIT))
         pyglet.app.run()
         total_bicycles_through += window.simulation.bicycles_through
         total_pedestrians_through += window.simulation.pedestrians_through

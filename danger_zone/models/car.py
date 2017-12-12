@@ -6,6 +6,7 @@ from danger_zone.parameters import CAR_WIDTH, CAR_HEIGHT, CAR_MAX_SPEED, \
 class Car(TrafficAgent):
     def __init__(self):
         super().__init__()
+        self.name = 'car'
         self.width = CAR_WIDTH
         self.height = CAR_HEIGHT
         self.max_speed = CAR_MAX_SPEED

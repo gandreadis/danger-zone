@@ -19,12 +19,11 @@ class Scenario:
         self.name = name
         self.image_file_name = os.path.join('maps', self.name + '.png')
         self.image_data = None
-        self.areas = [
-            {"car": [], "bicycle": [], "pedestrian": []},  # N
-            {"car": [], "bicycle": [], "pedestrian": []},  # E
-            {"car": [], "bicycle": [], "pedestrian": []},  # S
-            {"car": [], "bicycle": [], "pedestrian": []},  # W
-        ]
+        self.areas = {
+            "car": [[], [], [], []],
+            "bicycle": [[], [], [], []],
+            "pedestrian": [[], [], [], []],
+        }
 
     def read_from_file(self):
         img = Image.open(os.path.join('maps', self.name + '.png'))
@@ -50,4 +49,8 @@ class Scenario:
 
                     tile = self.get_tile(x, y)
                     if tile in (Tile.CAR, Tile.BICYCLE, Tile.PEDESTRIAN):
-                        self.areas[search_area_index][Tile.to_type_string(tile)].append((x, y))
+                        self.areas[Tile.to_type_string(tile)][search_area_index].append(
+                            np.array([float(x) - SPAWN_AREA_WIDTH, float(y) - SPAWN_AREA_WIDTH]))
+
+        for agent_type in self.areas.keys():
+            self.areas[agent_type] = list(filter(lambda x: x != [], self.areas[agent_type]))

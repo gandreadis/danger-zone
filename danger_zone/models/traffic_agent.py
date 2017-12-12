@@ -8,6 +8,7 @@ from danger_zone.util.vector_calculation import normalize, limit_length, get_vec
 
 class TrafficAgent:
     def __init__(self):
+        self.name = 'agent'
         self.position = np.array([MAP_WIDTH / 2.0, -10.0])
         self.velocity = np.array([0.0, 0.0])
         self.acceleration = np.array([0.0, 0.0])
