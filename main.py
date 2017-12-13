@@ -20,6 +20,8 @@ def main():
     parser.add_argument('-m', '--multiple', metavar='S', dest='runs', type=int, default=1, help='Run S simulations.')
     parser.add_argument('-c', '--csv', dest='should_export_csv', action='store_true',
                         help='Export CSV file of run statistics.')
+    parser.add_argument('-i', '--invisible', dest='window_is_hidden', action='store_true',
+                        help='Hide the window and run the simulation in headless mode.')
     args = parser.parse_args()
 
     total_bicycles_through = 0
@@ -29,7 +31,7 @@ def main():
     if args.should_export_csv:
         pathlib.Path('results').mkdir(exist_ok=True)
         directory = os.path.join("results", "results.csv")
-        results_file = open(directory, 'w')
+        results_file = open(directory, 'w', newline='')
         writer = csv.writer(results_file)
         writer.writerow(["Bicycles", "Pedestrians", "Cars", "Collisions"])
 
@@ -40,17 +42,21 @@ def main():
         if args.time_limit and args.should_export_gif:
             print('Running simulation for %s ticks, then exporting GIF file.' % args.time_limit)
             window = WindowController(Simulation(SETUPS["simple-sparse"], args.time_limit),
-                                      GifExporter(args.time_limit))
+                                      GifExporter(args.time_limit),
+                                      hidden=args.window_is_hidden)
         elif args.time_limit and not args.should_export_gif:
             print('Running simulation for %s ticks.' % args.time_limit)
-            window = WindowController(Simulation(SETUPS["simple-sparse"], args.time_limit))
+            window = WindowController(Simulation(SETUPS["simple-sparse"], args.time_limit),
+                                      hidden=args.window_is_hidden)
         elif not args.time_limit and args.should_export_gif:
             print('Running simulation for the default number of ticks, then exporting GIF file.')
             window = WindowController(Simulation(SETUPS["simple-sparse"], DEFAULT_TIME_LIMIT),
-                                      GifExporter(DEFAULT_TIME_LIMIT))
+                                      GifExporter(DEFAULT_TIME_LIMIT),
+                                      hidden=args.window_is_hidden)
         elif not args.time_limit and not args.should_export_gif:
             print('Running simulation for the default number of ticks.')
-            window = WindowController(Simulation(SETUPS["simple-sparse"], DEFAULT_TIME_LIMIT))
+            window = WindowController(Simulation(SETUPS["simple-sparse"], DEFAULT_TIME_LIMIT),
+                                      hidden=args.window_is_hidden)
         pyglet.app.run()
 
         if args.should_export_csv:

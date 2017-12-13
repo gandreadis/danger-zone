@@ -5,8 +5,8 @@ from danger_zone.util.vector_calculation import get_vector_angle
 
 
 class WindowController(pyglet.window.Window):
-    def __init__(self, simulation, gif_exporter=None):
-        super().__init__(width=MAP_WIDTH, height=MAP_HEIGHT)
+    def __init__(self, simulation, gif_exporter=None, hidden=False):
+        super().__init__(width=MAP_WIDTH, height=MAP_HEIGHT, visible=not hidden)
 
         self.simulation = simulation
         self.gif_exporter = gif_exporter
