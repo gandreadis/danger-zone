@@ -33,6 +33,7 @@ class Simulation:
             if self.tick % PERCEPTION_DELAY == 0:
                 agent.separate_from_other_agents(self.agents, self.record_collision)
                 agent.align(self.agents)
+                agent.consider_danger_zones(self.scenario)
 
             agent.move()
 
@@ -43,7 +44,7 @@ class Simulation:
                 if isinstance(agent, Bicycle):
                     self.bicycles_through += 1
                 if isinstance(agent, Car):
-                    self.cars_through +=1
+                    self.cars_through += 1
 
     def record_collision(self):
         self.collision_counter += 1

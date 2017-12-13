@@ -1,8 +1,12 @@
+import math
+
 import numpy as np
 import shapely.affinity
 import shapely.geometry
 
-from danger_zone.parameters import TARGET_DELTA, MAP_WIDTH, MAP_HEIGHT, MINIMUM_AGENT_DISTANCE, AGENT_VISIBILITY_RANGE
+from danger_zone.parameters import TARGET_DELTA, MAP_WIDTH, MAP_HEIGHT, MINIMUM_AGENT_DISTANCE, AGENT_VISIBILITY_RANGE, \
+    DANGER_LEVEL_VIEW_DISTANCE
+from danger_zone.tile import Tile
 from danger_zone.util.vector_calculation import normalize, limit_length, get_vector_angle
 
 
@@ -74,6 +78,38 @@ class TrafficAgent:
             limit_length(steering_force * 0.1, self.max_steering_force)
             self.acceleration += steering_force
 
+    def consider_danger_zones(self, scenario):
+        if self.point_outside_of_viewport(self.position):
+            return
+
+        current_tile = scenario.get_tile(math.floor(self.position[0]), math.floor(self.position[1]))
+        current_danger_level = Tile.get_danger_level(self.name, current_tile)
+        if current_danger_level <= 0:
+            return
+
+        min_x, min_y = -2, -2
+        min_danger_level = 1000
+
+        for x in (-1, 0, 1):
+            for y in (-1, 0, 1):
+                point = self.position + np.array([DANGER_LEVEL_VIEW_DISTANCE * x, DANGER_LEVEL_VIEW_DISTANCE * y])
+                if self.point_outside_of_viewport(point):
+                    continue
+
+                point_type = scenario.get_tile(math.floor(point[0]), math.floor(point[1]))
+                point_level = Tile.get_danger_level(self.name, point_type)
+
+                if point_level < min_danger_level:
+                    min_danger_level = point_level
+                    min_x, min_y = x, y
+
+        if min_x != -2:
+            lower_danger_force = np.array([DANGER_LEVEL_VIEW_DISTANCE * min_x, DANGER_LEVEL_VIEW_DISTANCE * min_y])
+            lower_danger_force = normalize(lower_danger_force) * self.max_speed
+            steering_force = lower_danger_force - self.velocity
+            limit_length(steering_force * 3, self.max_steering_force)
+            self.acceleration += steering_force
+
     def move(self):
         if self.has_reached_target:
             return
@@ -113,7 +149,10 @@ class TrafficAgent:
         points = list(zip(*self.shape.exterior.coords.xy))
 
         for point in points:
-            if (point[0] < 0 or point[0] > MAP_WIDTH) and (point[1] < 0 or point[1] > MAP_HEIGHT):
+            if self.point_outside_of_viewport(point):
                 num_points_outside_viewport += 1
 
         return num_points_outside_viewport > 2
+
+    def point_outside_of_viewport(self, point):
+        return (point[0] < 0 or point[0] >= MAP_WIDTH) or (point[1] < 0 or point[1] >= MAP_HEIGHT)
