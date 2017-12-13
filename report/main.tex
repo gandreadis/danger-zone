@@ -1,0 +1,63 @@
+\documentclass[12pt,a4paper]{report}
+
+% Reference to title and author
+\usepackage{titling}
+
+% Chapter titles
+\usepackage{titlesec}
+\titleformat{\chapter}
+  {\normalfont\Huge\bfseries}{\thechapter}{1em}{}
+\titlespacing*{\chapter}{0pt}{0ex}{2.3ex plus .2ex}
+
+% Hyperlinks
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+
+% For notes on what we still need to do - add as many (or little) as you like
+\usepackage[prependcaption]{todonotes}
+\newcommand{\TODO}{\todo[inline]}
+
+\title{Danger Zone}
+\author{
+    Georgios Andreadis, Jackson Matlak,\\
+    Heather Taylor, Tanisha Servet
+}
+\date{\today}
+
+
+\begin{document}
+
+\begin{titlepage}
+	\centering
+
+	{\scshape\LARGE VU Amsterdam \par}
+	\vspace{1cm}
+	{\scshape\Large Collective Intelligence\par}
+    \vspace{5cm}
+
+    \TODO{Add full report title}
+	{\huge\bfseries \thetitle \par}
+    \par\vspace{1cm}
+	{\Large\itshape \theauthor \par}
+
+	\vfill
+
+	{\large \thedate \par}
+\end{titlepage}
+
+\listoftodos
+
+\input{chapters/0-abstract.tex}
+\tableofcontents
+\input{chapters/1-introduction.tex}
+\input{chapters/2-related-work.tex}
+\input{chapters/3-algorithm-description.tex}
+\input{chapters/4-experimental-setup.tex}
+\input{chapters/5-results.tex}
+\input{chapters/6-discussion.tex}
+\input{chapters/7-conclusion.tex}
+
+%\bibliographystyle{abbrv}
+%\bibliography{main}
+
+\end{document}
