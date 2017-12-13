@@ -22,6 +22,7 @@ def main():
                         help='Export CSV file of run statistics.')
     parser.add_argument('-i', '--invisible', dest='window_is_hidden', action='store_true',
                         help='Hide the window and run the simulation in headless mode.')
+    parser.add_argument('-s', '--scenario', metavar='MAP_NAME', dest='map_name', type=str, default="simple-sparse")
     args = parser.parse_args()
 
     total_bicycles_through = 0
@@ -30,8 +31,7 @@ def main():
 
     if args.should_export_csv:
         pathlib.Path('results').mkdir(exist_ok=True)
-        directory = os.path.join("results", "results.csv")
-        results_file = open(directory, 'w', newline='')
+        results_file = open(os.path.join("results", args.map_name + ".csv"), 'w', newline='')
         writer = csv.writer(results_file)
         writer.writerow(["Bicycles", "Pedestrians", "Cars", "Collisions"])
 
@@ -41,21 +41,21 @@ def main():
         print('      Run number %s:' % run_number)
         if args.time_limit and args.should_export_gif:
             print('Running simulation for %s ticks, then exporting GIF file.' % args.time_limit)
-            window = WindowController(Simulation(SETUPS["simple-sparse"], args.time_limit),
+            window = WindowController(Simulation(SETUPS[args.map_name], args.time_limit),
                                       GifExporter(args.time_limit),
                                       hidden=args.window_is_hidden)
         elif args.time_limit and not args.should_export_gif:
             print('Running simulation for %s ticks.' % args.time_limit)
-            window = WindowController(Simulation(SETUPS["simple-sparse"], args.time_limit),
+            window = WindowController(Simulation(SETUPS[args.map_name], args.time_limit),
                                       hidden=args.window_is_hidden)
         elif not args.time_limit and args.should_export_gif:
             print('Running simulation for the default number of ticks, then exporting GIF file.')
-            window = WindowController(Simulation(SETUPS["simple-sparse"], DEFAULT_TIME_LIMIT),
+            window = WindowController(Simulation(SETUPS[args.map_name], DEFAULT_TIME_LIMIT),
                                       GifExporter(DEFAULT_TIME_LIMIT),
                                       hidden=args.window_is_hidden)
         elif not args.time_limit and not args.should_export_gif:
             print('Running simulation for the default number of ticks.')
-            window = WindowController(Simulation(SETUPS["simple-sparse"], DEFAULT_TIME_LIMIT),
+            window = WindowController(Simulation(SETUPS[args.map_name], DEFAULT_TIME_LIMIT),
                                       hidden=args.window_is_hidden)
         pyglet.app.run()
 
@@ -67,6 +67,9 @@ def main():
         total_pedestrians_through += window.simulation.pedestrians_through
         total_cars_through += window.simulation.cars_through
 
+    if args.should_export_csv:
+        results_file.close()
+        print('Results file saved as results.csv')
     print('- - - - - - - - - - - - - - - - - - - - - - - - - - -')
     print('      Results:')
     print('An average of %s bicycles reached their target.' % (total_bicycles_through / args.runs))
