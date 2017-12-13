@@ -31,3 +31,39 @@ class Tile:
             return "bicycle"
         elif tile_type == Tile.CAR:
             return "car"
+
+    @staticmethod
+    def get_danger_level(agent_type, tile_type):
+        if agent_type == "pedestrian":
+            if tile_type == Tile.NEUTRAL:
+                return 0
+            elif tile_type == Tile.PEDESTRIAN:
+                return 0
+            elif tile_type == Tile.BICYCLE:
+                return 1
+            elif tile_type == Tile.CAR:
+                return 2
+            else:
+                return -1
+        elif agent_type == "bicycle":
+            if tile_type == Tile.NEUTRAL:
+                return 0
+            elif tile_type == Tile.PEDESTRIAN:
+                return 1
+            elif tile_type == Tile.BICYCLE:
+                return 0
+            elif tile_type == Tile.CAR:
+                return 2
+            else:
+                return -1
+        elif agent_type == "car":
+            if tile_type == Tile.NEUTRAL:
+                return 0
+            elif tile_type == Tile.PEDESTRIAN:
+                return 2
+            elif tile_type == Tile.BICYCLE:
+                return 1
+            elif tile_type == Tile.CAR:
+                return 0
+            else:
+                return -1

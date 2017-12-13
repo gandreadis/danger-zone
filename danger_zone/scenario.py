@@ -38,7 +38,7 @@ class Scenario:
         img.close()
 
     def get_tile(self, x, y):
-        return Tile.from_rgb(self.image_data[y, x])
+        return Tile.from_rgb(self.image_data[y + SPAWN_AREA_WIDTH, x + SPAWN_AREA_WIDTH])
 
     def detect_areas(self):
         for search_area_index in range(len(Scenario.SEARCH_AREAS)):
@@ -47,7 +47,7 @@ class Scenario:
             for x in range(search_area[0], search_area[2]):
                 for y in range(search_area[1], search_area[3]):
 
-                    tile = self.get_tile(x, y)
+                    tile = self.get_tile(x - SPAWN_AREA_WIDTH, y - SPAWN_AREA_WIDTH)
                     if tile in (Tile.CAR, Tile.BICYCLE, Tile.PEDESTRIAN):
                         self.areas[Tile.to_type_string(tile)][search_area_index].append(
                             np.array([float(x) - SPAWN_AREA_WIDTH, float(y) - SPAWN_AREA_WIDTH]))
