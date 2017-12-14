@@ -22,7 +22,7 @@ def main():
                         help='Export CSV file of run statistics.')
     parser.add_argument('-i', '--invisible', dest='window_is_hidden', action='store_true',
                         help='Hide the window and run the simulation in headless mode.')
-    parser.add_argument('-s', '--scenario', metavar='MAP_NAME', dest='map_names', type=str, default="simple-sparse",
+    parser.add_argument(metavar='MAP_NAME', dest='map_names', type=str, default="simple-sparse",
                         nargs='+')
     args = parser.parse_args()
 
