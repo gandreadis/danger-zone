@@ -45,16 +45,16 @@ def main():
             print('      Run number %s:' % run_number)
             if args.time_limit and args.should_export_gif:
                 print('Running simulation for %s ticks, then exporting GIF file.' % args.time_limit)
-                window = WindowController(Simulation(SETUPS[args.map_name], args.time_limit),
+                window = WindowController(Simulation(SETUPS[scenario], args.time_limit),
                                           GifExporter(args.time_limit),
                                           hidden=args.window_is_hidden)
             elif args.time_limit and not args.should_export_gif:
                 print('Running simulation for %s ticks.' % args.time_limit)
-                window = WindowController(Simulation(SETUPS[args.map_name], args.time_limit),
+                window = WindowController(Simulation(SETUPS[scenario], args.time_limit),
                                           hidden=args.window_is_hidden)
             elif not args.time_limit and args.should_export_gif:
                 print('Running simulation for the default number of ticks, then exporting GIF file.')
-                window = WindowController(Simulation(SETUPS[args.map_name], DEFAULT_TIME_LIMIT),
+                window = WindowController(Simulation(SETUPS[scenario], DEFAULT_TIME_LIMIT),
                                           GifExporter(DEFAULT_TIME_LIMIT),
                                           hidden=args.window_is_hidden)
             elif not args.time_limit and not args.should_export_gif:
