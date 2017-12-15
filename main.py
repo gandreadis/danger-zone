@@ -34,6 +34,7 @@ def main():
         pathlib.Path('results').mkdir(exist_ok=True)
 
     for scenario in args.map_names:
+        print('Simulating scenario: %s' % scenario)
         if args.should_export_csv:
             results_file = open(os.path.join("results", scenario + ".csv"), 'w', newline='')
             writer = csv.writer(results_file)
@@ -78,6 +79,7 @@ def main():
     print('An average of %s bicycles reached their target.' % (total_bicycles_through / args.runs))
     print('An average of %s pedestrians reached their target.' % (total_pedestrians_through / args.runs))
     print('An average of %s cars reached their target.' % (total_cars_through / args.runs))
+    print('-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*')
 
 
 if __name__ == "__main__":
