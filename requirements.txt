@@ -1,5 +1,3 @@
 numpy
 pyglet
-imageio
-shapely
-Pillow
+progressbar2
