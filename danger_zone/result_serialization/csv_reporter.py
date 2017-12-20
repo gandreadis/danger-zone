@@ -3,7 +3,7 @@ import logging
 import os
 import pathlib
 
-from danger_zone.iteration_data import IterationData
+from danger_zone.result_serialization.iteration_data import IterationData
 
 
 class CSVReporter:
