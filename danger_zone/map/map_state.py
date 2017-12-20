@@ -1,0 +1,2 @@
+class MapState:
+    pass
