@@ -1,7 +1,4 @@
-from enum import Enum
-
-
-class Tile(Enum):
+class Tile:
     CAR_ZONE_NORTH = "^"
     CAR_ZONE_EAST = ">"
     CAR_ZONE_SOUTH = "v"

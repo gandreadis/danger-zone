@@ -1,6 +1,7 @@
 import pyglet
 
 from danger_zone.map.map import MAP_SIZE, Map
+from danger_zone.map.tile_types import Tile
 from danger_zone.result_serialization.trace import Trace
 from danger_zone.visualization.tile_colors import TILE_COLORS
 
@@ -35,11 +36,33 @@ class Playback(pyglet.window.Window):
         for x in range(MAP_SIZE):
             for y in range(MAP_SIZE):
                 tile = self.map.get_tile(x, y)
-                self.draw_rect(x * TILE_SIZE, y * TILE_SIZE, (x + 1) * TILE_SIZE, (y + 1) * TILE_SIZE,
-                               TILE_COLORS[tile])
+                self.draw_tile(x, y, TILE_COLORS[tile])
 
     def draw_current_tick(self):
-        pass
+        if self.tick >= len(self.tick_states):
+            return
+
+        pedestrians = self.tick_states[self.tick]["pedestrians"]
+        for pedestrian in pedestrians:
+            self.draw_tile(pedestrian["x"], pedestrian["y"], TILE_COLORS[Tile.PEDESTRIAN])
+
+        cars = self.tick_states[self.tick]["cars"]
+        for car in cars:
+            self.draw_tile(car["x"], car["y"], TILE_COLORS[Tile.CAR])
+            self.draw_tile(car["x"] + 1, car["y"], TILE_COLORS[Tile.CAR])
+            self.draw_tile(car["x"], car["y"] + 1, TILE_COLORS[Tile.CAR])
+            self.draw_tile(car["x"] + 1, car["y"] + 1, TILE_COLORS[Tile.CAR])
+
+            if car["is_horizontal"]:
+                self.draw_tile(car["x"] + 2, car["y"], TILE_COLORS[Tile.CAR])
+                self.draw_tile(car["x"] + 2, car["y"] + 1, TILE_COLORS[Tile.CAR])
+            else:
+                self.draw_tile(car["x"], car["y"] + 2, TILE_COLORS[Tile.CAR])
+                self.draw_tile(car["x"] + 1, car["y"] + 2, TILE_COLORS[Tile.CAR])
+
+    def draw_tile(self, x, y, color):
+        self.draw_rect(x * TILE_SIZE, (MAP_SIZE - y - 1) * TILE_SIZE, (x + 1) * TILE_SIZE, (MAP_SIZE - y) * TILE_SIZE,
+                       color)
 
     def draw_rect(self, x1, y1, x2, y2, color):
         quad = pyglet.graphics.vertex_list(4,
