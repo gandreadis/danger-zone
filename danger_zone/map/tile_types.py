@@ -16,6 +16,14 @@ class Tile:
     EMPTY = "."
 
 
+PEDESTRIAN_ZONES = (
+    Tile.PEDESTRIAN_ZONE,
+    Tile.NEUTRAL_ZONE_NORTH,
+    Tile.NEUTRAL_ZONE_EAST,
+    Tile.NEUTRAL_ZONE_SOUTH,
+    Tile.NEUTRAL_ZONE_WEST,
+)
+
 TILE_DIRECTIONS = {
     Tile.CAR_ZONE_NORTH: (0, -1),
     Tile.CAR_ZONE_EAST: (-1, 0),

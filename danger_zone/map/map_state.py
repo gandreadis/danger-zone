@@ -94,6 +94,13 @@ class MapState:
     def get_tile_from_cache(self, x, y):
         return self.tile_cache[y + SPAWN_MARGIN][x + SPAWN_MARGIN]
 
+    def get_dynamic_tile(self, x, y):
+        dynamic_tile = self.get_tile_from_cache(x, y)
+        if dynamic_tile == Tile.EMPTY:
+            return self.map.get_tile(x, y)
+        else:
+            return dynamic_tile
+
     def set_tile_in_cache(self, x, y, value):
         self.tile_cache[y + SPAWN_MARGIN][x + SPAWN_MARGIN] = value
 
