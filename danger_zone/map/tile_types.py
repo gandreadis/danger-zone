@@ -12,9 +12,7 @@ class Tile:
     CAR_SPAWN_HORIZONTAL = "k"
     PEDESTRIAN_SPAWN = "p"
     CAR = "|"
-    CAR_FUTURE = "$"
     PEDESTRIAN = "x"
-    PEDESTRIAN_FUTURE = "%"
     EMPTY = "."
 
 

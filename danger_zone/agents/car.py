@@ -1,5 +1,5 @@
 from danger_zone.map.map import MAP_SIZE
-from danger_zone.map.tile_types import TILE_DIRECTIONS
+from danger_zone.map.tile_types import TILE_DIRECTIONS, Tile
 
 CAR_LENGTH = 3
 CAR_WIDTH = 2
@@ -12,6 +12,7 @@ class Car:
         self.in_spawn_area = True
         self.is_horizontal = is_horizontal
         self.map_state = map_state
+        self.previous_direction = (0, 0)
 
     def move(self):
         x, y = self.position
@@ -20,7 +21,13 @@ class Car:
             if 0 <= x < MAP_SIZE and 0 <= y < MAP_SIZE:
                 self.in_spawn_area = False
 
-        current_map_tile = self.map_state.map.get_tile(x, y)
+        probe_x, probe_y = x, y
+        if self.previous_direction == (1, 0):
+            probe_x += CAR_LENGTH - 1
+        elif self.previous_direction == (0, 1):
+            probe_y += CAR_LENGTH - 1
+
+        current_map_tile = self.map_state.map.get_tile(probe_x, probe_y)
         preferred_direction = (0, 0)
 
         if self.in_spawn_area:
@@ -35,7 +42,51 @@ class Car:
         elif current_map_tile in TILE_DIRECTIONS:
             preferred_direction = TILE_DIRECTIONS[current_map_tile]
 
-        self.position = self.position[0] + preferred_direction[0], self.position[1] + preferred_direction[1]
+        if preferred_direction == (0, 0):
+            return
+
+        new_tiles = self.calculate_additional_tiles(preferred_direction)
+
+        if self.map_state.get_tile_from_cache(*new_tiles[0]) == Tile.EMPTY \
+                and self.map_state.get_tile_from_cache(*new_tiles[1]) == Tile.EMPTY:
+            self.position = self.position[0] + preferred_direction[0], self.position[1] + preferred_direction[1]
+            self.update_cache_after_move(preferred_direction, new_tiles)
+            self.previous_direction = preferred_direction[:]
+
+    def calculate_additional_tiles(self, preferred_direction):
+        if preferred_direction == (1, 0):
+            return (
+                (self.position[0] + CAR_LENGTH, self.position[1]),
+                (self.position[0] + CAR_LENGTH, self.position[1] + 1))
+        elif preferred_direction == (-1, 0):
+            return (
+                (self.position[0] - 1, self.position[1]),
+                (self.position[0] - 1, self.position[1] + 1))
+        elif preferred_direction == (0, 1):
+            return (
+                (self.position[0], self.position[1] + CAR_LENGTH),
+                (self.position[0] + 1, self.position[1] + CAR_LENGTH))
+        elif preferred_direction == (0, -1):
+            return (
+                (self.position[0], self.position[1] - 1),
+                (self.position[0] + 1, self.position[1] - 1))
+
+    def update_cache_after_move(self, direction_moved, new_tiles):
+        self.map_state.set_tile_in_cache(*new_tiles[0], Tile.CAR)
+        self.map_state.set_tile_in_cache(*new_tiles[1], Tile.CAR)
+
+        if direction_moved == (1, 0):
+            self.map_state.set_tile_in_cache(self.position[0], self.position[1], Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0], self.position[1] + 1, Tile.EMPTY)
+        elif direction_moved == (-1, 0):
+            self.map_state.set_tile_in_cache(self.position[0] + CAR_LENGTH - 1, self.position[1], Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0] + CAR_LENGTH - 1, self.position[1] + 1, Tile.EMPTY)
+        elif direction_moved == (0, 1):
+            self.map_state.set_tile_in_cache(self.position[0], self.position[1], Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0] + 1, self.position[1], Tile.EMPTY)
+        elif direction_moved == (0, -1):
+            self.map_state.set_tile_in_cache(self.position[0], self.position[1] + CAR_LENGTH - 1, Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0] + 1, self.position[1] + CAR_LENGTH - 1, Tile.EMPTY)
 
     def get_tiles(self):
         tiles = []
@@ -51,19 +102,19 @@ class Car:
         x, y = self.position
 
         if x <= -CAR_LENGTH \
-                and (self.spawn_position[1] > 0 or y != self.spawn_position[1]) \
+                and (self.spawn_position[0] > 0 or y != self.spawn_position[1]) \
                 and self.is_horizontal:
             return True
         elif x >= MAP_SIZE \
-                and (self.spawn_position[1] < MAP_SIZE or y != self.spawn_position[1]) \
+                and (self.spawn_position[0] < MAP_SIZE or y != self.spawn_position[1]) \
                 and self.is_horizontal:
             return True
         elif y <= -CAR_LENGTH \
-                and (self.spawn_position[0] > 0 or x != self.spawn_position[0]) \
+                and (self.spawn_position[1] > 0 or x != self.spawn_position[0]) \
                 and not self.is_horizontal:
             return True
         elif y >= MAP_SIZE \
-                and (self.spawn_position[0] < MAP_SIZE or x != self.spawn_position[0]) \
+                and (self.spawn_position[1] < MAP_SIZE or x != self.spawn_position[0]) \
                 and not self.is_horizontal:
             return True
         else:
