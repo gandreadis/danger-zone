@@ -21,3 +21,7 @@ class IterationData:
     def update_target_reach_counts(self, pedestrians, cars):
         self.pedestrians_that_reached_target += pedestrians
         self.cars_that_reached_target += cars
+
+    def update_failed_spawn_counts(self, pedestrians, cars):
+        self.failed_pedestrian_spawns += pedestrians
+        self.failed_car_spawns += cars

@@ -12,5 +12,19 @@ class Tile:
     CAR_SPAWN_HORIZONTAL = "k"
     PEDESTRIAN_SPAWN = "p"
     CAR = "|"
+    CAR_FUTURE = "$"
     PEDESTRIAN = "x"
+    PEDESTRIAN_FUTURE = "%"
     EMPTY = "."
+
+
+TILE_DIRECTIONS = {
+    Tile.CAR_ZONE_NORTH: (0, -1),
+    Tile.CAR_ZONE_EAST: (-1, 0),
+    Tile.CAR_ZONE_SOUTH: (0, 1),
+    Tile.CAR_ZONE_WEST: (1, 0),
+    Tile.NEUTRAL_ZONE_NORTH: (0, -1),
+    Tile.NEUTRAL_ZONE_EAST: (-1, 0),
+    Tile.NEUTRAL_ZONE_SOUTH: (0, 1),
+    Tile.NEUTRAL_ZONE_WEST: (1, 0),
+}
