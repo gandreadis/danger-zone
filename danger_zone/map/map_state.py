@@ -2,6 +2,7 @@ import numpy as np
 
 from danger_zone.agents.car import Car
 from danger_zone.agents.pedestrian import Pedestrian
+from danger_zone.map.map import FULL_SIZE, SPAWN_MARGIN
 from danger_zone.map.tile_types import Tile
 
 
@@ -11,8 +12,16 @@ class MapState:
         self.pedestrians = []
         self.cars = []
         self.spawn_tiles = {}
+        self.tile_cache = None
 
         self.find_spawn_tiles()
+
+    def get_tiles_on_position(self, x, y):
+        tiles = []
+        if self.tile_cache[y, x] != 0:
+            tiles.append(self.tile_cache[y, x])
+        tiles.append(self.map.get_tile(x, y))
+        return tiles
 
     def find_spawn_tiles(self):
         self.spawn_tiles["pedestrian"] = self.map.find_all_occurrences_of_tile(Tile.PEDESTRIAN_SPAWN)
@@ -51,3 +60,18 @@ class MapState:
                 self.cars.remove(car)
 
         return pedestrians_that_reached_target, cars_that_reached_target
+
+    def rebuild_tile_cache(self):
+        self.tile_cache = np.zeros([FULL_SIZE, FULL_SIZE])
+
+        for pedestrian in self.pedestrians:
+            self.set_tile_in_cache(*pedestrian.position, Tile.PEDESTRIAN)
+        for car in self.cars:
+            for car_tile in car.get_tiles():
+                self.set_tile_in_cache(*car_tile, Tile.CAR)
+
+    def get_tile_from_cache(self, x, y):
+        return self.tile_cache[y + SPAWN_MARGIN, x + SPAWN_MARGIN]
+
+    def set_tile_in_cache(self, x, y, value):
+        self.tile_cache[y + SPAWN_MARGIN, x + SPAWN_MARGIN] = value
