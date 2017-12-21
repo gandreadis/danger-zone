@@ -8,10 +8,19 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-Run the following command to get a list of all possible commands:
+
+### Simulation
+Run the following command to get a list of all possible commands for the simulation tool:
 
 ```commandline
 python main.py -h
+```
+
+### Playback
+Run the following command to get a list of all possible commands for the playback tool:
+
+```commandline
+python visualizer.py -h
 ```
 
 ## Building the Report
@@ -24,26 +33,4 @@ pdflatex main.tex
 The compiled PDF will be placed in that same `report` folder, with the name `main.pdf`.
 
 ## Map Format Specification
-`danger-zone` uses a text-based map definition system. A mapping from characters to tiles is presented below:
-
-```text
-# Danger Zones
-^ - Car tile, moving North
-> - Car tile, moving East
-v - Car tile, moving South
-< - Car tile, moving West
-o - Pedestrian tile
-w - Neutral (crosswalk) tile, moving North
-d - Neutral (crosswalk) tile, moving East
-s - Neutral (crosswalk) tile, moving South
-a - Neutral (crosswalk) tile, moving West
-
-# Spawn and Target Areas
-i - Car spawn tile, moving vertically
-k - Car spawn tile, moving horizontally
-p - Pedestrian spawn / target tile
-
-# Objects
-| - Car
-x - Pedestrian
-```
+`danger-zone` uses a text-based map definition system. A mapping from characters to tiles can be found in `danger_zone/map/tile_types.py`.
