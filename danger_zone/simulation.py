@@ -28,6 +28,9 @@ class Simulation:
         bar = progressbar.ProgressBar()
 
         for tick in bar(range(self.num_ticks)):
+            self.iteration_data.update_target_reach_counts(*self.map_state.remove_finished_agents())
+            self.map_state.spawn_agents(tick, self.pedestrian_spawn_delay, self.car_spawn_delay)
+
             self.save_tick_to_trace()
 
         self.csv_reporter.save_iteration_results(self.iteration_data)

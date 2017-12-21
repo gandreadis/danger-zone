@@ -17,8 +17,10 @@ class Trace:
 
     def add_tick_state(self, map_state):
         new_tick_state = {
-            "pedestrians": [{"x": pedestrian.x, "y": pedestrian.y} for pedestrian in map_state.pedestrians],
-            "cars": [{"x": car.x, "y": car.y, "is_horizontal": car.is_horizontal} for car in map_state.cars],
+            "pedestrians": [{"x": pedestrian.position[0], "y": pedestrian.position[1]}
+                            for pedestrian in map_state.pedestrians],
+            "cars": [{"x": car.position[0], "y": car.position[1], "is_horizontal": car.is_horizontal}
+                     for car in map_state.cars],
         }
         self.tick_states.append(new_tick_state)
 

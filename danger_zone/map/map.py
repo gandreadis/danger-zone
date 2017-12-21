@@ -7,6 +7,12 @@ MAPS_DIRECTORY = "maps"
 
 
 class Map:
+    @staticmethod
+    def read_map_from_file(map_name):
+        map_file = open(os.path.join(MAPS_DIRECTORY, map_name + ".txt"), "r")
+        lines = [l.strip() for l in map_file]
+        return Map(lines[:FULL_SIZE])
+
     def __init__(self, map_rows):
         self.tiles = map_rows
 
@@ -17,8 +23,11 @@ class Map:
     def get_tile(self, x, y):
         return self.tiles[y + SPAWN_MARGIN][x + SPAWN_MARGIN]
 
-    @staticmethod
-    def read_map_from_file(map_name):
-        map_file = open(os.path.join(MAPS_DIRECTORY, map_name + ".txt"), "r")
-        lines = [l.strip() for l in map_file]
-        return Map(lines[:FULL_SIZE])
+    def find_all_occurrences_of_tile(self, tile):
+        occurrences = []
+        for x in range(-SPAWN_MARGIN, MAP_SIZE + SPAWN_MARGIN):
+            for y in range(-SPAWN_MARGIN, MAP_SIZE + SPAWN_MARGIN):
+                if self.get_tile(x, y) == tile:
+                    occurrences.append((x, y))
+
+        return occurrences

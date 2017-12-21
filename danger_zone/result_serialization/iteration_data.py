@@ -17,3 +17,7 @@ class IterationData:
 
     def to_list(self):
         return [getattr(self, column) for column in IterationData.LABELS]
+
+    def update_target_reach_counts(self, pedestrians, cars):
+        self.pedestrians_that_reached_target += pedestrians
+        self.cars_that_reached_target += cars
