@@ -45,6 +45,7 @@ class Playback(pyglet.window.Window):
         pedestrians = self.tick_states[self.tick]["pedestrians"]
         for pedestrian in pedestrians:
             self.draw_tile(pedestrian["x"], pedestrian["y"], TILE_COLORS[Tile.PEDESTRIAN])
+            self.draw_rectangle_outline(pedestrian["x"], pedestrian["y"], 1, 1)
 
         cars = self.tick_states[self.tick]["cars"]
         for car in cars:
@@ -56,9 +57,28 @@ class Playback(pyglet.window.Window):
             if car["is_horizontal"]:
                 self.draw_tile(car["x"] + 2, car["y"], TILE_COLORS[Tile.CAR])
                 self.draw_tile(car["x"] + 2, car["y"] + 1, TILE_COLORS[Tile.CAR])
+                self.draw_rectangle_outline(car["x"], car["y"], 3, 2)
             else:
                 self.draw_tile(car["x"], car["y"] + 2, TILE_COLORS[Tile.CAR])
                 self.draw_tile(car["x"] + 1, car["y"] + 2, TILE_COLORS[Tile.CAR])
+                self.draw_rectangle_outline(car["x"], car["y"], 2, 3)
+
+    def draw_rectangle_outline(self, x, y, width, height):
+        pyglet.graphics.glColor3b(0, 0, 0)
+        pyglet.gl.glLineWidth(3)
+        display_x = x * TILE_SIZE
+        display_y = (MAP_SIZE - y) * TILE_SIZE
+        point1 = display_x, display_y
+        point2 = display_x + width * TILE_SIZE, display_y
+        point3 = display_x + width * TILE_SIZE, display_y - height * TILE_SIZE
+        point4 = display_x, display_y - height * TILE_SIZE
+
+        pyglet.graphics.draw(8, pyglet.gl.GL_LINES, ('v2i', [
+            *point1, *point2,
+            *point2, *point3,
+            *point3, *point4,
+            *point4, *point1,
+        ]))
 
     def draw_tile(self, x, y, color):
         self.draw_rect(x * TILE_SIZE, (MAP_SIZE - y - 1) * TILE_SIZE, (x + 1) * TILE_SIZE, (MAP_SIZE - y) * TILE_SIZE,
