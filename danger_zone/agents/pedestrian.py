@@ -17,6 +17,7 @@ class Pedestrian:
             if len(path) > 1:
                 self.move_to_position(list(path)[1])
         else:
+            # Choose random neighbour if algorithm finds no path, to avoid deadlock
             self.move_to_random_neighbour()
 
     def move_to_random_neighbour(self):
