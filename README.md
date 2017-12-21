@@ -39,10 +39,8 @@ s - Neutral (crosswalk) tile, moving South
 a - Neutral (crosswalk) tile, moving West
 
 # Spawn and Target Areas
-i - Car spawn tile, moving North
-l - Car spawn tile, moving East
-k - Car spawn tile, moving South
-j - Car spawn tile, moving West
+i - Car spawn tile, moving vertically
+k - Car spawn tile, moving horizontally
 p - Pedestrian spawn / target tile
 
 # Objects
