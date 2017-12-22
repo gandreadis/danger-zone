@@ -1,13 +1,18 @@
 import argparse
-import logging
 
-import progressbar
 import pyglet
 
 from danger_zone.visualization.playback import Playback
+from main import setup_logger
 
 
 def main():
+    """
+    Main entry point for the visualizer.
+
+    Run `python visualizer.py -h` for a list of all available command-line options.
+    """
+
     parser = argparse.ArgumentParser(description="Playback of an urban traffic simulation.")
     parser.add_argument(metavar='SIMULATION_RUN_NAME', dest='simulation_name', type=str, default="simple-medium")
 
@@ -18,11 +23,6 @@ def main():
     setup_logger()
     Playback(args.simulation_name, args.iteration)
     pyglet.app.run()
-
-
-def setup_logger():
-    progressbar.streams.wrap_stderr()
-    logging.basicConfig()
 
 
 if __name__ == "__main__":

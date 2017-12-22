@@ -8,6 +8,12 @@ from danger_zone.experiment import Experiment
 
 
 def main():
+    """
+    Main entry point for the simulator.
+
+    Run `python main.py -h` for a list of all available command-line options.
+    """
+
     parser = argparse.ArgumentParser(description="Simulation of urban traffic interactions.")
     parser.add_argument("-l", "--limit", metavar="N", dest="num_ticks", type=int, default=100,
                         help="Run simulation for N ticks.")
@@ -32,6 +38,8 @@ def main():
 
 
 def setup_logger():
+    """Sets up the logging system."""
+
     progressbar.streams.wrap_stderr()
     logging.basicConfig(level=logging.INFO)
 
