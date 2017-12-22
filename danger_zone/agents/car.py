@@ -71,6 +71,11 @@ class Car:
                 (self.position[0] + 1, self.position[1] - 1))
 
     def can_advance(self, new_tiles, preferred_direction):
+        # If next tiles are beyond map, don't advance
+        if not self.map_state.map.is_on_map(*new_tiles[0]) or not self.map_state.map.is_on_map(*new_tiles[1]):
+            return False
+
+        # If next tiles are occupied, don't advance
         if self.map_state.get_tile_from_cache(*new_tiles[0]) != Tile.EMPTY \
                 or self.map_state.get_tile_from_cache(*new_tiles[1]) != Tile.EMPTY:
             return False
@@ -82,6 +87,7 @@ class Car:
         )
 
         for x, y in two_tiles_ahead:
+            # If there is a pedestrian on a tile that's two steps ahead, don't advance
             if self.map_state.map.is_on_map(x, y) \
                     and self.map_state.map.get_tile(x, y) in NEUTRAL_ZONES \
                     and self.map_state.get_dynamic_tile(x, y) == Tile.PEDESTRIAN:

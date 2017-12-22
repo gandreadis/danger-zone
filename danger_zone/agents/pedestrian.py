@@ -1,5 +1,7 @@
 import math
 
+import numpy as np
+
 from danger_zone.agents.pedestrian_pathfinder import PedestrianPathfinder
 from danger_zone.map.tile_types import Tile, PEDESTRIAN_ZONES
 
@@ -26,10 +28,11 @@ class Pedestrian:
         directions = ((1, 0), (0, 1), (-1, 0), (0, -1))
         neighbour_tile_positions = [(self.position[0] + dir[0], self.position[1] + dir[1]) for dir in directions]
 
-        # Sort by closeness to target (pick best-effort first)
-        neighbour_tile_positions = sorted(neighbour_tile_positions,
-                                          key=lambda tile: math.hypot(self.target[0] - tile[0],
-                                                                      self.target[1] - tile[1]))
+        if np.random.randint(0, 2) == 0:
+            # Sort by closeness to target (pick best-effort first)
+            neighbour_tile_positions = sorted(neighbour_tile_positions,
+                                              key=lambda tile: math.hypot(self.target[0] - tile[0],
+                                                                          self.target[1] - tile[1]))
         neighbour_tiles = [self.map_state.get_dynamic_tile(*pos) for pos in neighbour_tile_positions]
 
         for i in range(len(neighbour_tiles)):
