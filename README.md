@@ -24,9 +24,11 @@ python visualizer.py -h
 ```
 
 ## Building the Report
-The report is written in LaTeX, so you'll need to have a standard LaTeX distribution installed on your system. We recommend [TeX Live](https://www.tug.org/texlive/acquire-netinstall.html). Once you have this set up, run the following command from within the `report` directory:
+The report is written in LaTeX, so you'll need to have a standard LaTeX distribution installed on your system. We recommend [TeX Live](https://www.tug.org/texlive/acquire-netinstall.html). Once you have this set up, run the following commands:
 
 ```commandline
+cd report
+python generate_listing.py
 pdflatex main.tex
 ```
 

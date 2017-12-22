@@ -8,6 +8,8 @@
 \titleformat{\chapter}
   {\normalfont\Huge\bfseries}{\thechapter}{1em}{}
 \titlespacing*{\chapter}{0pt}{0ex}{2.3ex plus .2ex}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
 
 % Hyperlinks
 \usepackage[hidelinks]{hyperref}
@@ -16,6 +18,47 @@
 % For notes on what we still need to do - add as many (or little) as you like
 \usepackage[prependcaption]{todonotes}
 \newcommand{\TODO}{\todo[inline]}
+
+% Appendices
+\usepackage[toc,page]{appendix}
+
+% Framed boxes
+\usepackage{framed}
+
+% Page margins
+\usepackage{geometry}
+\geometry{margin=0.8in}
+
+% Floats
+\usepackage{float}
+
+% Listings
+\usepackage{dirtree}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\scriptsize\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+  breakatwhitespace=true,
+  tabsize=2,
+  frame=single
+}
 
 \title{Danger Zone}
 \author{
@@ -59,5 +102,9 @@
 
 %\bibliographystyle{abbrv}
 %\bibliography{main}
+
+\begin{appendices}
+\input{chapters/listing.tex}
+\end{appendices}
 
 \end{document}
