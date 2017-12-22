@@ -31,3 +31,9 @@ class Map:
                     occurrences.append((x, y))
 
         return occurrences
+
+    def is_on_map(self, x, y):
+        return -SPAWN_MARGIN <= x < MAP_SIZE + SPAWN_MARGIN and -SPAWN_MARGIN <= y < MAP_SIZE + SPAWN_MARGIN
+
+    def is_on_main_map(self, x, y):
+        return 0 <= x < MAP_SIZE and 0 <= y < MAP_SIZE

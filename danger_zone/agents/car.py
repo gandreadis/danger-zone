@@ -1,5 +1,5 @@
 from danger_zone.map.map import MAP_SIZE
-from danger_zone.map.tile_types import TILE_DIRECTIONS, Tile
+from danger_zone.map.tile_types import TILE_DIRECTIONS, Tile, NEUTRAL_ZONES
 
 CAR_LENGTH = 3
 CAR_WIDTH = 2
@@ -45,15 +45,14 @@ class Car:
         if preferred_direction == (0, 0):
             return
 
-        new_tiles = self.calculate_additional_tiles(preferred_direction)
+        new_tiles = self.calculate_tiles_ahead(preferred_direction)
 
-        if self.map_state.get_tile_from_cache(*new_tiles[0]) == Tile.EMPTY \
-                and self.map_state.get_tile_from_cache(*new_tiles[1]) == Tile.EMPTY:
+        if self.can_advance(new_tiles, preferred_direction):
             self.position = self.position[0] + preferred_direction[0], self.position[1] + preferred_direction[1]
             self.update_cache_after_move(preferred_direction, new_tiles)
             self.previous_direction = preferred_direction[:]
 
-    def calculate_additional_tiles(self, preferred_direction):
+    def calculate_tiles_ahead(self, preferred_direction):
         if preferred_direction == (1, 0):
             return (
                 (self.position[0] + CAR_LENGTH, self.position[1]),
@@ -70,6 +69,25 @@ class Car:
             return (
                 (self.position[0], self.position[1] - 1),
                 (self.position[0] + 1, self.position[1] - 1))
+
+    def can_advance(self, new_tiles, preferred_direction):
+        if self.map_state.get_tile_from_cache(*new_tiles[0]) != Tile.EMPTY \
+                or self.map_state.get_tile_from_cache(*new_tiles[1]) != Tile.EMPTY:
+            return False
+
+        # Check two tiles ahead for pedestrians, in case of neutral zone
+        two_tiles_ahead = (
+            (new_tiles[0][0] + preferred_direction[0], new_tiles[0][1] + preferred_direction[1]),
+            (new_tiles[1][0] + preferred_direction[0], new_tiles[1][1] + preferred_direction[1]),
+        )
+
+        for x, y in two_tiles_ahead:
+            if self.map_state.map.is_on_map(x, y) \
+                    and self.map_state.map.get_tile(x, y) in NEUTRAL_ZONES \
+                    and self.map_state.get_dynamic_tile(x, y) == Tile.PEDESTRIAN:
+                return False
+
+        return True
 
     def update_cache_after_move(self, direction_moved, new_tiles):
         self.map_state.set_tile_in_cache(*new_tiles[0], Tile.CAR)
