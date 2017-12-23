@@ -1,85 +1,47 @@
 import argparse
-import csv
-import os
-import pathlib
+import logging
+import time
 
-import pyglet
+import progressbar
 
-from danger_zone.parameters import DEFAULT_TIME_LIMIT
-from danger_zone.setups import SETUPS
-from danger_zone.simulation import Simulation
-from danger_zone.ui.gif_exporter import GifExporter
-from danger_zone.ui.window_controller import WindowController
+from danger_zone.experiment import Experiment
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Run traffic simulations.')
-    parser.add_argument('-g', '--gif', dest='should_export_gif', action='store_true',
-                        help='Export GIF animation of the simulation.')
-    parser.add_argument('-l', '--limit', metavar='N', dest='time_limit', type=int, help='Run a simulation for N ticks.')
-    parser.add_argument('-m', '--multiple', metavar='S', dest='runs', type=int, default=1, help='Run S simulations.')
-    parser.add_argument('-c', '--csv', dest='should_export_csv', action='store_true',
-                        help='Export CSV file of run statistics.')
-    parser.add_argument('-i', '--invisible', dest='window_is_hidden', action='store_true',
-                        help='Hide the window and run the simulation in headless mode.')
-    parser.add_argument(metavar='MAP_NAME', dest='map_names', type=str, default="simple-sparse",
-                        nargs='+')
+    """
+    Main entry point for the simulator.
+
+    Run `python main.py -h` for a list of all available command-line options.
+    """
+
+    parser = argparse.ArgumentParser(description="Simulation of urban traffic interactions.")
+    parser.add_argument("-l", "--limit", metavar="N", dest="num_ticks", type=int, default=100,
+                        help="Run simulation for N ticks.")
+    parser.add_argument("-m", "--multiple", metavar="I", dest="num_iterations", type=int, default=1,
+                        help="Run the simulation I times.")
+    parser.add_argument("-p", "--pedestrians", metavar="P", dest="pedestrian_spawn_delay", type=int, default=5,
+                        help="Run the simulation with P ticks of delay between pedestrian spawns.")
+    parser.add_argument("-c", "--cars", metavar="C", dest="car_spawn_delay", type=int, default=5,
+                        help="Run the simulation with C ticks of delay between car spawns.")
+    parser.add_argument("-s", "--store-sequence", dest="store_sequence", action="store_true",
+                        help="Store sequence of states in output file, for future playbacks.")
+    parser.add_argument(metavar='SIMULATION_NAME', dest='simulation_name', type=str, default="simple-low")
     args = parser.parse_args()
 
-    total_bicycles_through = 0
-    total_pedestrians_through = 0
-    total_cars_through = 0
+    setup_logger()
+    experiment = Experiment(args)
 
-    if args.should_export_csv:
-        pathlib.Path('results').mkdir(exist_ok=True)
+    start_time = time.clock()
+    experiment.run()
+    end_time = time.clock()
+    logging.info("Successfully simulated experiment in {}s".format(int(end_time - start_time)))
 
-    for scenario in args.map_names:
-        print('Simulating scenario: %s' % scenario)
-        if args.should_export_csv:
-            results_file = open(os.path.join("results", scenario + ".csv"), 'w', newline='')
-            writer = csv.writer(results_file)
-            writer.writerow(["Bicycles", "Pedestrians", "Cars", "Collisions"])
-        print('Running %s simulations...' % args.runs)
-        for run_number in range(1, args.runs + 1):
-            print('- - - - - - - - - - - - - - - - - - - - - - - - - - -')
-            print('      Run number %s:' % run_number)
-            if args.time_limit and args.should_export_gif:
-                print('Running simulation for %s ticks, then exporting GIF file.' % args.time_limit)
-                window = WindowController(Simulation(SETUPS[scenario], args.time_limit),
-                                          GifExporter(args.time_limit),
-                                          hidden=args.window_is_hidden)
-            elif args.time_limit and not args.should_export_gif:
-                print('Running simulation for %s ticks.' % args.time_limit)
-                window = WindowController(Simulation(SETUPS[scenario], args.time_limit),
-                                          hidden=args.window_is_hidden)
-            elif not args.time_limit and args.should_export_gif:
-                print('Running simulation for the default number of ticks, then exporting GIF file.')
-                window = WindowController(Simulation(SETUPS[scenario], DEFAULT_TIME_LIMIT),
-                                          GifExporter(DEFAULT_TIME_LIMIT),
-                                          hidden=args.window_is_hidden)
-            elif not args.time_limit and not args.should_export_gif:
-                print('Running simulation for the default number of ticks.')
-                window = WindowController(Simulation(SETUPS[scenario], DEFAULT_TIME_LIMIT),
-                                          hidden=args.window_is_hidden)
-            pyglet.app.run()
 
-        if args.should_export_csv:
-            print('Writing to CSV file...')
-            writer.writerow([window.simulation.bicycles_through, window.simulation.pedestrians_through,
-                             window.simulation.cars_through, window.simulation.collision_counter])
-        total_bicycles_through += window.simulation.bicycles_through
-        total_pedestrians_through += window.simulation.pedestrians_through
-        total_cars_through += window.simulation.cars_through
+def setup_logger():
+    """Sets up the logging system."""
 
-    if args.should_export_csv:
-        results_file.close()
-        print('Results file saved as results.csv')
-    print('- - - - - - - - - - - - - - - - - - - - - - - - - - -')
-    print('      Results:')
-    print('An average of %s bicycles reached their target.' % (total_bicycles_through / args.runs))
-    print('An average of %s pedestrians reached their target.' % (total_pedestrians_through / args.runs))
-    print('An average of %s cars reached their target.' % (total_cars_through / args.runs))
-    print('-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*')
+    progressbar.streams.wrap_stderr()
+    logging.basicConfig(level=logging.INFO)
 
 
 if __name__ == "__main__":

@@ -334,3 +334,5 @@ auto/*
 gif_frames/
 danger-zone-export.gif
 results/
+simulation_data/
+simulation_traces/

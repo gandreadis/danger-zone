@@ -1,66 +1,68 @@
-import numpy as np
+import progressbar
 
-from danger_zone.models.bicycle import Bicycle
-from danger_zone.models.car import Car
-from danger_zone.models.pedestrian import Pedestrian
-from danger_zone.parameters import PERCEPTION_DELAY
-from danger_zone.scenario import Scenario
-from danger_zone.util.traffic_agent_types import TRAFFIC_AGENT_TYPES
+from danger_zone.map.map import Map
+from danger_zone.map.map_state import MapState
+from danger_zone.result_serialization.iteration_data import IterationData
+from danger_zone.result_serialization.trace import Trace
 
 
 class Simulation:
-    def __init__(self, setup, limit):
-        self.setup = setup
-        self.scenario = Scenario(setup["scenario-name"])
-        self.scenario.read_from_file()
-        self.scenario.detect_areas()
+    """Class representing one simulation run."""
 
-        self.agents = []
-        self.tick = 0
-        self.collision_counter = 0
-        self.max_tick = limit
-        self.pedestrians_through = 0
-        self.bicycles_through = 0
-        self.cars_through = 0
+    def __init__(self, args, iteration, csv_reporter):
+        """
+        Constructs an instance of this class.
 
-    def on_tick(self):
-        self.tick += 1
-        self.spawn_agents("pedestrian")
-        self.spawn_agents("bicycle")
-        self.spawn_agents("car")
+        :param args: The parsed commandline arguments passed to this program.
+        :param iteration: The iteration number.
+        :param csv_reporter: The `CSVReporter` instance that should be used to report output data.
+        """
 
-        for agent in self.agents:
-            if self.tick % PERCEPTION_DELAY == 0:
-                agent.separate_from_other_agents(self.agents, self.record_collision)
-                agent.align(self.agents)
-                agent.consider_danger_zones(self.scenario)
+        self.num_ticks = args.num_ticks
+        self.store_sequence = args.store_sequence
+        self.simulation_name = args.simulation_name
+        self.pedestrian_spawn_delay = args.pedestrian_spawn_delay
+        self.car_spawn_delay = args.car_spawn_delay
+        self.iteration = iteration
+        self.csv_reporter = csv_reporter
 
-            agent.move()
+        self.map = Map.read_map_from_file(self.simulation_name)
+        self.map_state = MapState(self.map)
 
-            if agent.has_reached_target:
-                self.agents.remove(agent)
-                if isinstance(agent, Pedestrian):
-                    self.pedestrians_through += 1
-                if isinstance(agent, Bicycle):
-                    self.bicycles_through += 1
-                if isinstance(agent, Car):
-                    self.cars_through += 1
+        self.iteration_data = IterationData(0, 0, 0, 0, 0)
 
-    def record_collision(self):
-        self.collision_counter += 1
+        if self.store_sequence:
+            self.trace = Trace(self.simulation_name, iteration)
 
-    # noinspection PyTypeChecker,PyUnresolvedReferences
-    def spawn_agents(self, type):
-        if self.tick % self.setup["spawn-delay"][type] == 0:
-            agent = TRAFFIC_AGENT_TYPES[type]()
-            spawn_index = np.random.randint(0, len(self.scenario.areas[type]))
-            target_index = (spawn_index + np.random.randint(1, len(self.scenario.areas[type]))) % len(
-                self.scenario.areas[type])
+    def run(self):
+        """Runs the simulation iteration."""
 
-            agent.position = self.select_random_point_in_area(self.scenario.areas[type][spawn_index])
-            agent.target = self.select_random_point_in_area(self.scenario.areas[type][target_index])
-            agent.cache_shape()
-            self.agents.append(agent)
+        bar = progressbar.ProgressBar()
 
-    def select_random_point_in_area(self, area):
-        return area[np.random.randint(0, len(area))]
+        for tick in bar(range(self.num_ticks)):
+            target_data = self.map_state.remove_finished_agents()
+            self.iteration_data.update_target_reach_counts(*target_data)
+
+            self.map_state.rebuild_tile_cache()
+            failed_spawn_data = self.map_state.spawn_agents(tick, self.pedestrian_spawn_delay, self.car_spawn_delay)
+            self.iteration_data.update_failed_spawn_counts(*failed_spawn_data)
+            self.map_state.rebuild_tile_cache()
+
+            self.map_state.move_all_agents()
+
+            self.save_tick_to_trace()
+
+        self.csv_reporter.save_iteration_results(self.iteration_data)
+        self.persist_trace()
+
+    def save_tick_to_trace(self):
+        """Saves the current tick state to the trace, for later serialization."""
+
+        if self.store_sequence:
+            self.trace.add_tick_state(self.map_state)
+
+    def persist_trace(self):
+        """Persists the trace of this simulation run to disk."""
+
+        if self.store_sequence:
+            self.trace.save_and_close()
