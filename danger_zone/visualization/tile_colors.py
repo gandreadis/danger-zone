@@ -1,3 +1,4 @@
+# Mapping of tiles to colors
 TILE_COLORS = {
     "^": (50, 50, 50),
     ">": (50, 50, 50),

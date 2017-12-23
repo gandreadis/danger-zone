@@ -6,7 +6,17 @@ CAR_WIDTH = 2
 
 
 class Car:
+    """Class representing a car agent."""
+
     def __init__(self, position, is_horizontal, map_state):
+        """
+        Constructs an instance of this class.
+
+        :param position: The initial position of the agent (spawn-location).
+        :param is_horizontal: Whether the car is horizontally oriented.
+        :param map_state: The current MapState instance.
+        """
+
         self.position = position
         self.spawn_position = position[:]
         self.in_spawn_area = True
@@ -15,35 +25,23 @@ class Car:
         self.previous_direction = (0, 0)
 
     def move(self):
+        """
+        Evaluates the current tick state and makes a move if the tiles in front of it allow it.
+
+        Looks first at the probe tile underneath it. From this, it derives its preferred direction. After having decided
+        which way it wants to go, it checks the tiles immediately in front of it for other agents. If they are occupied,
+        the agent does not move. If those are free, the agent checks the tiles two steps in front of it. If those are
+        crosswalk (neutral) tiles and if they are occupied by pedestrians, no move is made. Else, the agent proceeds to
+        move ahead.
+        """
+
         x, y = self.position
 
         if self.in_spawn_area:
             if 0 <= x < MAP_SIZE and 0 <= y < MAP_SIZE:
                 self.in_spawn_area = False
 
-        probe_x, probe_y = x, y
-        if self.previous_direction == (1, 0):
-            probe_x += CAR_LENGTH - 1
-        elif self.previous_direction == (0, 1):
-            probe_y += CAR_LENGTH - 1
-
-        current_map_tile = self.map_state.map.get_tile(probe_x, probe_y)
-        preferred_direction = (0, 0)
-
-        if self.in_spawn_area:
-            if x < 0:
-                preferred_direction = (1, 0)
-            elif x >= MAP_SIZE:
-                preferred_direction = (-1, 0)
-            elif y < 0:
-                preferred_direction = (0, 1)
-            elif y >= MAP_SIZE:
-                preferred_direction = (0, -1)
-        elif current_map_tile in TILE_DIRECTIONS:
-            preferred_direction = TILE_DIRECTIONS[current_map_tile]
-
-        if preferred_direction == (0, 0):
-            return
+        preferred_direction = self.get_preferred_direction()
 
         new_tiles = self.calculate_tiles_ahead(preferred_direction)
 
@@ -52,7 +50,60 @@ class Car:
             self.update_cache_after_move(preferred_direction, new_tiles)
             self.previous_direction = preferred_direction[:]
 
+    def get_preferred_direction(self):
+        """
+        Decides which direction to go next.
+
+        If the agent is still in the spawn margin, it checks in which of the four margins it is situated. Else, it
+        checks the map tile underneath the top-left corner for the tile direction.
+
+        :return: The preferred direction of movement.
+        """
+
+        x, y = self.position
+
+        current_map_tile = self.map_state.map.get_tile(*self.get_probe_location())
+
+        if self.in_spawn_area:
+            if x < 0:
+                return 1, 0
+            elif x >= MAP_SIZE:
+                return -1, 0
+            elif y < 0:
+                return 0, 1
+            elif y >= MAP_SIZE:
+                return 0, -1
+        elif current_map_tile in TILE_DIRECTIONS:
+            return TILE_DIRECTIONS[current_map_tile]
+
+        return 0, 0
+
+    def get_probe_location(self):
+        """
+        Determines the coordinates of the probing location.
+
+        This location should always be the front left tile, relative to the cars rotation.
+
+        :return: The coordinates of the direction probing location.
+        """
+
+        probe_x, probe_y = self.position
+
+        if self.previous_direction == (1, 0):
+            probe_x += CAR_LENGTH - 1
+        elif self.previous_direction == (0, 1):
+            probe_y += CAR_LENGTH - 1
+
+        return probe_x, probe_y
+
     def calculate_tiles_ahead(self, preferred_direction):
+        """
+        Calculates the coordinates of the tiles that lie immediately ahead.
+
+        :param preferred_direction: The direction the car will be moving in.
+        :return: The tiles that lie one hop ahead.
+        """
+
         if preferred_direction == (1, 0):
             return (
                 (self.position[0] + CAR_LENGTH, self.position[1]),
@@ -71,6 +122,14 @@ class Car:
                 (self.position[0] + 1, self.position[1] - 1))
 
     def can_advance(self, new_tiles, preferred_direction):
+        """
+        Determines whether the car can advance in the direction it wants to (based on occupancy of tiles ahead).
+
+        :param new_tiles: The differential of new tiles that will be occupied.
+        :param preferred_direction: The direction that the car should move in.
+        :return: Whether the agent is allowed to move in this direction.
+        """
+
         # If next tiles are beyond map, don't advance
         if not self.map_state.map.is_on_map(*new_tiles[0]) or not self.map_state.map.is_on_map(*new_tiles[1]):
             return False
@@ -96,6 +155,13 @@ class Car:
         return True
 
     def update_cache_after_move(self, direction_moved, new_tiles):
+        """
+        Updates the dynamic MapState tile cache following a successful move.
+
+        :param direction_moved: The direction that the car has been determined to move in.
+        :param new_tiles: The differential of new tiles that will be occupied.
+        """
+
         self.map_state.set_tile_in_cache(*new_tiles[0], Tile.CAR)
         self.map_state.set_tile_in_cache(*new_tiles[1], Tile.CAR)
 
@@ -113,6 +179,12 @@ class Car:
             self.map_state.set_tile_in_cache(self.position[0] + 1, self.position[1] + CAR_LENGTH - 1, Tile.EMPTY)
 
     def get_tiles(self):
+        """
+        Returns the tiles that this car occupies on the map.
+
+        :return: The tiles that the agent occupies.
+        """
+
         tiles = []
         for x in range(self.position[0],
                        self.position[0] + CAR_LENGTH if self.is_horizontal else self.position[0] + CAR_WIDTH):
@@ -123,6 +195,12 @@ class Car:
         return tiles
 
     def is_done(self):
+        """
+        Determines if the car has reached a spawn area that is not its original spawn area.
+
+        :return: `True` iff. the car has reached another spawn area and can be removed from the map.
+        """
+
         x, y = self.position
 
         if x <= -CAR_LENGTH \

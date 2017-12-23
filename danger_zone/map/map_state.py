@@ -7,8 +7,16 @@ from danger_zone.map.tile_types import Tile
 
 
 class MapState:
-    def __init__(self, map):
-        self.map = map
+    """Class representing a map under simulation."""
+
+    def __init__(self, static_map):
+        """
+        Constructs a new instance of this class.
+
+        :param static_map: The Map instance to be used, defining the static structure of the map (i.e. the tiles).
+        """
+
+        self.map = static_map
         self.pedestrians = []
         self.cars = []
         self.spawn_tiles = {}
@@ -16,18 +24,15 @@ class MapState:
 
         self.find_spawn_tiles()
 
-    def get_tiles_on_position(self, x, y):
-        tiles = []
-        if self.get_tile_from_cache(x, y) != Tile.EMPTY:
-            tiles.append(self.get_tile_from_cache(x, y))
-        tiles.append(self.map.get_tile(x, y))
-        return tiles
-
     def move_all_agents(self):
+        """Executes the `move()` action on all agents currently in simulation."""
+
         [pedestrian.move() for pedestrian in self.pedestrians]
         [car.move() for car in self.cars]
 
     def find_spawn_tiles(self):
+        """Identifies all spawn tiles on the map and saves them in the corresponding internal lists."""
+
         self.spawn_tiles["pedestrian"] = self.map.find_all_occurrences_of_tile(Tile.PEDESTRIAN_SPAWN)
         self.spawn_tiles["car"] = []
         self.spawn_tiles["car"] += [(x, y, False)
@@ -36,6 +41,15 @@ class MapState:
                                     for x, y in self.map.find_all_occurrences_of_tile(Tile.CAR_SPAWN_HORIZONTAL)]
 
     def spawn_agents(self, tick, pedestrian_spawn_delay, car_spawn_delay):
+        """
+        Spawns all agents of this tick cycle.
+
+        :param tick: The current tick.
+        :param pedestrian_spawn_delay: The delay between two spawns of pedestrians (enforced by a modulo operation).
+        :param car_spawn_delay: The delay between two spawns of pedestrians (enforced by a modulo operation).
+        :return: The number of failed pedestrian and car spawns.
+        """
+
         failed_pedestrian_spawns = 0
         failed_car_spawns = 0
 
@@ -67,6 +81,12 @@ class MapState:
         return failed_pedestrian_spawns, failed_car_spawns
 
     def remove_finished_agents(self):
+        """
+        Removes all agents that have reached a target.
+
+        :return: The numbers of pedestrians and cars that have reached their targets.
+        """
+
         pedestrians_that_reached_target = 0
         cars_that_reached_target = 0
 
@@ -83,6 +103,8 @@ class MapState:
         return pedestrians_that_reached_target, cars_that_reached_target
 
     def rebuild_tile_cache(self):
+        """Rebuilds the tile cache from scratch."""
+
         self.tile_cache = [[Tile.EMPTY for x in range(FULL_SIZE)] for y in range(FULL_SIZE)]
 
         for pedestrian in self.pedestrians:
@@ -92,9 +114,27 @@ class MapState:
                 self.set_tile_in_cache(*car_tile, Tile.CAR)
 
     def get_tile_from_cache(self, x, y):
+        """
+        Returns the given tile character from the cache.
+
+        :param x: The x coordinate.
+        :param y: The y coordinate.
+        :return: The tile character in cache at that location.
+        """
+
         return self.tile_cache[y + SPAWN_MARGIN][x + SPAWN_MARGIN]
 
     def get_dynamic_tile(self, x, y):
+        """
+        Gets the effective tile at that location.
+
+        If the dynamic map has an entry at that position, that tile is returned. Else, the static tile is returned.
+
+        :param x: The x coordinate.
+        :param y: The y coordinate.
+        :return: The tile at that location.
+        """
+
         dynamic_tile = self.get_tile_from_cache(x, y)
         if dynamic_tile == Tile.EMPTY:
             return self.map.get_tile(x, y)
@@ -102,9 +142,24 @@ class MapState:
             return dynamic_tile
 
     def set_tile_in_cache(self, x, y, value):
+        """
+        Sets the given cache location to the given `value`.
+
+        :param x: The x coordinate.
+        :param y: The y coordinate.
+        :param value: The tile character to be set at that cache location.
+        """
         self.tile_cache[y + SPAWN_MARGIN][x + SPAWN_MARGIN] = value
 
     def car_spawn_area_is_empty(self, x, y):
+        """
+        Checks whether all tiles of the given car spawn area are empty.
+
+        :param x: The x coordinate.
+        :param y: The y coordinate.
+        :return: `True` iff. all tiles of the car spawn area are unoccupied.
+        """
+
         is_horizontal = self.get_tile_from_cache(x, y) == Tile.CAR_SPAWN_HORIZONTAL
         dummy_car = Car((x, y), is_horizontal, self)
 

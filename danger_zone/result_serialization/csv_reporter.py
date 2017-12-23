@@ -7,9 +7,17 @@ from danger_zone.result_serialization.iteration_data import IterationData
 
 
 class CSVReporter:
+    """Class responsible for saving simulation outputs to CSVs."""
+
     DIRECTORY_NAME = "simulation_data"
 
     def __init__(self, args):
+        """
+        Constructs an instance of this class.
+
+        :param args: The parsed command-line arguments that were given to this program.
+        """
+
         file_name = "{}_ticks{}-ped{}-car{}.csv".format(
             args.simulation_name,
             args.num_ticks,
@@ -22,8 +30,16 @@ class CSVReporter:
         self.output_writer.writerow(IterationData.LABELS)
 
     def save_iteration_results(self, iteration_data):
+        """
+        Saves the current iteration as a row in the CSV file.
+
+        :param iteration_data: An `IterationData` instance holding the data that should be written to that row.
+        """
+
         self.output_writer.writerow(iteration_data.to_list())
 
     def close(self):
+        """Closes the current output file."""
+
         self.output_file.close()
         logging.info("Simulation data saved in '{}'".format(self.path_name))

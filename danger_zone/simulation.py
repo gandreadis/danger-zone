@@ -7,7 +7,17 @@ from danger_zone.result_serialization.trace import Trace
 
 
 class Simulation:
+    """Class representing one simulation run."""
+
     def __init__(self, args, iteration, csv_reporter):
+        """
+        Constructs an instance of this class.
+
+        :param args: The parsed commandline arguments passed to this program.
+        :param iteration: The iteration number.
+        :param csv_reporter: The `CSVReporter` instance that should be used to report output data.
+        """
+
         self.num_ticks = args.num_ticks
         self.store_sequence = args.store_sequence
         self.simulation_name = args.simulation_name
@@ -25,6 +35,8 @@ class Simulation:
             self.trace = Trace(self.simulation_name, iteration)
 
     def run(self):
+        """Runs the simulation iteration."""
+
         bar = progressbar.ProgressBar()
 
         for tick in bar(range(self.num_ticks)):
@@ -44,9 +56,13 @@ class Simulation:
         self.persist_trace()
 
     def save_tick_to_trace(self):
+        """Saves the current tick state to the trace, for later serialization."""
+
         if self.store_sequence:
             self.trace.add_tick_state(self.map_state)
 
     def persist_trace(self):
+        """Persists the trace of this simulation run to disk."""
+
         if self.store_sequence:
             self.trace.save_and_close()

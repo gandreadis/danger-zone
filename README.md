@@ -18,6 +18,8 @@ Run the following command to get a list of all possible commands for the simulat
 python main.py -h
 ```
 
+See the `experiment_scripts` folder for a list of sample execution scripts.
+
 ### Playback
 Run the following command to get a list of all possible commands for the playback tool:
 
