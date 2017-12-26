@@ -43,10 +43,13 @@ class Car:
 
         preferred_direction = self.get_preferred_direction()
 
+        if preferred_direction == (0, 0):
+            return
+
         new_tiles = self.calculate_tiles_ahead(preferred_direction)
 
         if self.can_advance(new_tiles, preferred_direction):
-            self.position = self.position[0] + preferred_direction[0], self.position[1] + preferred_direction[1]
+            self.position = self.position[0] + preferred_direction[0] * 2, self.position[1] + preferred_direction[1] * 2
             self.update_cache_after_move(preferred_direction, new_tiles)
             self.previous_direction = preferred_direction[:]
 
@@ -101,25 +104,74 @@ class Car:
         Calculates the coordinates of the tiles that lie immediately ahead.
 
         :param preferred_direction: The direction the car will be moving in.
-        :return: The tiles that lie one hop ahead.
+        :return: The tiles that lie one or two hops ahead.
         """
 
         if preferred_direction == (1, 0):
             return (
                 (self.position[0] + CAR_LENGTH, self.position[1]),
-                (self.position[0] + CAR_LENGTH, self.position[1] + 1))
+                (self.position[0] + CAR_LENGTH, self.position[1] + 1),
+                (self.position[0] + CAR_LENGTH + 1, self.position[1]),
+                (self.position[0] + CAR_LENGTH + 1, self.position[1] + 1),
+            )
         elif preferred_direction == (-1, 0):
             return (
                 (self.position[0] - 1, self.position[1]),
-                (self.position[0] - 1, self.position[1] + 1))
+                (self.position[0] - 1, self.position[1] + 1),
+                (self.position[0] - 2, self.position[1]),
+                (self.position[0] - 2, self.position[1] + 1),
+            )
         elif preferred_direction == (0, 1):
             return (
                 (self.position[0], self.position[1] + CAR_LENGTH),
-                (self.position[0] + 1, self.position[1] + CAR_LENGTH))
+                (self.position[0] + 1, self.position[1] + CAR_LENGTH),
+                (self.position[0], self.position[1] + CAR_LENGTH + 1),
+                (self.position[0] + 1, self.position[1] + CAR_LENGTH + 1),
+            )
         elif preferred_direction == (0, -1):
             return (
                 (self.position[0], self.position[1] - 1),
-                (self.position[0] + 1, self.position[1] - 1))
+                (self.position[0] + 1, self.position[1] - 1),
+                (self.position[0], self.position[1] - 2),
+                (self.position[0] + 1, self.position[1] - 2),
+            )
+
+    def calculate_crosswalk_check_tiles(self, preferred_direction):
+        """
+        Calculates the coordinates of the tiles that lie to either side of the car, for waiting pedestrians.
+
+        :param preferred_direction: The direction the car will be moving in.
+        :return: The tiles that lie to diagonally in front of it.
+        """
+
+        if preferred_direction == (1, 0):
+            return (
+                (self.position[0] + CAR_LENGTH, self.position[1] - 1),
+                (self.position[0] + CAR_LENGTH, self.position[1] + 2),
+                (self.position[0] + CAR_LENGTH + 1, self.position[1] - 1),
+                (self.position[0] + CAR_LENGTH + 1, self.position[1] + 2),
+            )
+        elif preferred_direction == (-1, 0):
+            return (
+                (self.position[0] - 1, self.position[1] - 1),
+                (self.position[0] - 1, self.position[1] + 2),
+                (self.position[0] - 2, self.position[1] - 1),
+                (self.position[0] - 2, self.position[1] + 2),
+            )
+        elif preferred_direction == (0, 1):
+            return (
+                (self.position[0] - 1, self.position[1] + CAR_LENGTH),
+                (self.position[0] + 2, self.position[1] + CAR_LENGTH),
+                (self.position[0] - 1, self.position[1] + CAR_LENGTH + 1),
+                (self.position[0] + 2, self.position[1] + CAR_LENGTH + 1),
+            )
+        elif preferred_direction == (0, -1):
+            return (
+                (self.position[0] - 1, self.position[1] - 1),
+                (self.position[0] + 2, self.position[1] - 1),
+                (self.position[0] - 1, self.position[1] - 2),
+                (self.position[0] + 2, self.position[1] - 2),
+            )
 
     def can_advance(self, new_tiles, preferred_direction):
         """
@@ -135,17 +187,23 @@ class Car:
             return False
 
         # If next tiles are occupied, don't advance
-        if self.map_state.get_tile_from_cache(*new_tiles[0]) != Tile.EMPTY \
-                or self.map_state.get_tile_from_cache(*new_tiles[1]) != Tile.EMPTY:
+        if [self.map_state.get_tile_from_cache(*tile) != Tile.EMPTY for tile in new_tiles].count(True) > 0:
             return False
 
-        # Check two tiles ahead for pedestrians, in case of neutral zone
-        two_tiles_ahead = (
-            (new_tiles[0][0] + preferred_direction[0], new_tiles[0][1] + preferred_direction[1]),
-            (new_tiles[1][0] + preferred_direction[0], new_tiles[1][1] + preferred_direction[1]),
+        # If the tiles are crosswalks and pedestrians are next to them, don't advance
+        if [self.map_state.map.get_tile(x, y) in NEUTRAL_ZONES for x, y in new_tiles].count(True) > 0:
+            crosswalk_checks = self.calculate_crosswalk_check_tiles(preferred_direction)
+            if [self.map_state.get_tile_from_cache(*crosswalk_check) == Tile.PEDESTRIAN
+                for crosswalk_check in crosswalk_checks].count(True) > 0:
+                return False
+
+        # Check three tiles ahead for pedestrians, in case of neutral zone
+        three_tiles_ahead = (
+            (new_tiles[2][0] + preferred_direction[0], new_tiles[2][1] + preferred_direction[1]),
+            (new_tiles[3][0] + preferred_direction[0], new_tiles[3][1] + preferred_direction[1]),
         )
 
-        for x, y in two_tiles_ahead:
+        for x, y in three_tiles_ahead:
             # If there is a pedestrian on a tile that's two steps ahead, don't advance
             if self.map_state.map.is_on_map(x, y) \
                     and self.map_state.map.get_tile(x, y) in NEUTRAL_ZONES \
@@ -168,15 +226,23 @@ class Car:
         if direction_moved == (1, 0):
             self.map_state.set_tile_in_cache(self.position[0], self.position[1], Tile.EMPTY)
             self.map_state.set_tile_in_cache(self.position[0], self.position[1] + 1, Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0] + 1, self.position[1], Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0] + 1, self.position[1] + 1, Tile.EMPTY)
         elif direction_moved == (-1, 0):
-            self.map_state.set_tile_in_cache(self.position[0] + CAR_LENGTH - 1, self.position[1], Tile.EMPTY)
-            self.map_state.set_tile_in_cache(self.position[0] + CAR_LENGTH - 1, self.position[1] + 1, Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0] + CAR_LENGTH - 2, self.position[1], Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0] + CAR_LENGTH - 2, self.position[1] + 1, Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0] + CAR_LENGTH - 2, self.position[1], Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0] + CAR_LENGTH - 2, self.position[1] + 1, Tile.EMPTY)
         elif direction_moved == (0, 1):
             self.map_state.set_tile_in_cache(self.position[0], self.position[1], Tile.EMPTY)
             self.map_state.set_tile_in_cache(self.position[0] + 1, self.position[1], Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0], self.position[1] + 1, Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0] + 1, self.position[1] + 1, Tile.EMPTY)
         elif direction_moved == (0, -1):
             self.map_state.set_tile_in_cache(self.position[0], self.position[1] + CAR_LENGTH - 1, Tile.EMPTY)
             self.map_state.set_tile_in_cache(self.position[0] + 1, self.position[1] + CAR_LENGTH - 1, Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0], self.position[1] + CAR_LENGTH - 2, Tile.EMPTY)
+            self.map_state.set_tile_in_cache(self.position[0] + 1, self.position[1] + CAR_LENGTH - 2, Tile.EMPTY)
 
     def get_tiles(self):
         """

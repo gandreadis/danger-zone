@@ -1,5 +1,7 @@
 import os
 
+from danger_zone.map.tile_types import Tile
+
 MAP_SIZE = 16
 SPAWN_MARGIN = 3
 FULL_SIZE = MAP_SIZE + SPAWN_MARGIN * 2
@@ -44,6 +46,9 @@ class Map:
         :param y: The y coordinate.
         :return: The tile character at that position.
         """
+
+        if not self.is_on_map(x, y):
+            return Tile.EMPTY
 
         return self.tiles[y + SPAWN_MARGIN][x + SPAWN_MARGIN]
 

@@ -122,6 +122,9 @@ class MapState:
         :return: The tile character in cache at that location.
         """
 
+        if not self.map.is_on_map(x, y):
+            return Tile.EMPTY
+
         return self.tile_cache[y + SPAWN_MARGIN][x + SPAWN_MARGIN]
 
     def get_dynamic_tile(self, x, y):
@@ -149,7 +152,9 @@ class MapState:
         :param y: The y coordinate.
         :param value: The tile character to be set at that cache location.
         """
-        self.tile_cache[y + SPAWN_MARGIN][x + SPAWN_MARGIN] = value
+
+        if self.map.is_on_map(x, y):
+            self.tile_cache[y + SPAWN_MARGIN][x + SPAWN_MARGIN] = value
 
     def car_spawn_area_is_empty(self, x, y):
         """
