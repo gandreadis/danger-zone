@@ -6,14 +6,15 @@
 % Chapter titles
 \usepackage{titlesec}
 \titleformat{\chapter}
-  {\normalfont\Huge\bfseries}{\thechapter}{1em}{}
+{\normalfont\Huge\bfseries}{\thechapter}{1em}{}
 \titlespacing*{\chapter}{0pt}{0ex}{2.3ex plus .2ex}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 
 % Hyperlinks
 \usepackage[hidelinks]{hyperref}
-\usepackage{url}
 
 % For notes on what we still need to do - add as many (or little) as you like
 \usepackage[prependcaption]{todonotes}
@@ -21,6 +22,8 @@
 
 % Appendices
 \usepackage[toc,page]{appendix}
+\usepackage[backend=bibtex8,style=ieee]{biblatex}
+\bibliography{bibliography.bib}
 
 % Framed boxes
 \usepackage{framed}
@@ -42,69 +45,68 @@
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
 \lstset{frame=tb,
-  language=Python,
-  aboveskip=3mm,
-  belowskip=3mm,
-  showstringspaces=false,
-  columns=flexible,
-  basicstyle={\scriptsize\ttfamily},
-  numbers=none,
-  numberstyle=\tiny\color{gray},
-  keywordstyle=\color{blue},
-  commentstyle=\color{dkgreen},
-  stringstyle=\color{mauve},
-  breaklines=true,
-  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
-  breakatwhitespace=true,
-  tabsize=2,
-  frame=single
+language=Python,
+aboveskip=3mm,
+belowskip=3mm,
+showstringspaces=false,
+columns=flexible,
+basicstyle={\scriptsize\ttfamily},
+numbers=none,
+numberstyle=\tiny\color{gray},
+keywordstyle=\color{blue},
+commentstyle=\color{dkgreen},
+stringstyle=\color{mauve},
+breaklines=true,
+postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+breakatwhitespace=true,
+tabsize=2,
+frame=single
 }
 
 \title{Danger Zone}
 \author{
-    Georgios Andreadis, Jackson Matlak,\\
-    Heather Taylor, Tanisha Servet
+Georgios Andreadis, Jackson Matlak,\\
+Heather Taylor, Tanisha Servet
 }
 \date{\today}
 
 
 \begin{document}
 
-\begin{titlepage}
-	\centering
+    \begin{titlepage}
+        \centering
 
-	{\scshape\LARGE VU Amsterdam \par}
-	\vspace{1cm}
-	{\scshape\Large Collective Intelligence\par}
-    \vspace{5cm}
+        {\scshape\LARGE VU Amsterdam \par}
+        \vspace{1cm}
+        {\scshape\Large Collective Intelligence\par}
+        \vspace{5cm}
 
-    \TODO{Add full report title}
-	{\huge\bfseries \thetitle \par}
-    \par\vspace{1cm}
-	{\Large\itshape \theauthor \par}
+        \TODO{Add full report title}
+        {\huge\bfseries \thetitle \par}
+        \par\vspace{1cm}
+        {\Large\itshape \theauthor \par}
 
-	\vfill
+        \vfill
 
-	{\large \thedate \par}
-\end{titlepage}
+        {\large \thedate \par}
+    \end{titlepage}
 
-\listoftodos
+    \listoftodos
 
-\input{chapters/0-abstract.tex}
-\tableofcontents
-\input{chapters/1-introduction.tex}
-\input{chapters/2-related-work.tex}
-\input{chapters/3-algorithm-description.tex}
-\input{chapters/4-experimental-setup.tex}
-\input{chapters/5-results.tex}
-\input{chapters/6-discussion.tex}
-\input{chapters/7-conclusion.tex}
+    \input{chapters/0-abstract.tex}
+    \tableofcontents
+    \input{chapters/1-introduction.tex}
+    \input{chapters/2-related-work.tex}
+    \input{chapters/3-algorithm-description.tex}
+    \input{chapters/4-experimental-setup.tex}
+    \input{chapters/5-results.tex}
+    \input{chapters/6-discussion.tex}
+    \input{chapters/7-conclusion.tex}
 
-%\bibliographystyle{abbrv}
-%\bibliography{main}
-
-\begin{appendices}
-\input{chapters/listing.tex}
-\end{appendices}
+    \begin{appendices}
+        \chapter{References}
+        \printbibliography[heading=none]
+        \input{chapters/listing.tex}
+    \end{appendices}
 
 \end{document}
