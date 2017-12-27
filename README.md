@@ -38,5 +38,7 @@ pdflatex main.tex
 
 The compiled PDF will be placed in that same `report` folder, with the name `main.pdf`.
 
+To count the total number of words in the report, run `texcount -inc main.tex` from the `report` directory.
+
 ## Map Format Specification
 `danger-zone` uses a text-based map definition system. A mapping from characters to tiles can be found in `danger_zone/map/tile_types.py`.
