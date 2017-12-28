@@ -3,11 +3,15 @@
 % Reference to title and author
 \usepackage{titling}
 
-% Chapter titles
+% Fonts
 \usepackage{titlesec}
+\usepackage{avant}
+\usepackage{mathptmx}
+
+% Chapter titles
 \titleformat{\chapter}
-{\normalfont\Huge\bfseries}{\thechapter}{1em}{}
-\titlespacing*{\chapter}{0pt}{0ex}{2.3ex plus .2ex}
+{\Huge\bfseries\normalfont\sffamily}{\thechapter}{1em}{}
+\titlespacing*{\chapter}{0pt}{5ex}{2.3ex plus .2ex}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -30,7 +34,7 @@
 
 % Page margins
 \usepackage{geometry}
-\geometry{margin=0.8in}
+\geometry{margin=0.9in}
 
 % Floats
 \usepackage{float}
@@ -63,7 +67,7 @@ tabsize=2,
 frame=single
 }
 
-\title{Danger Zone}
+\title{Danger-Zone: A comparative study of mixed-traffic scenarios using collective intelligence simulation}
 \author{
 Georgios Andreadis, Jackson Matlak,\\
 Heather Taylor, Tanisha Servet
@@ -81,8 +85,7 @@ Heather Taylor, Tanisha Servet
         {\scshape\Large Collective Intelligence\par}
         \vspace{5cm}
 
-        \TODO{Add full report title}
-        {\huge\bfseries \thetitle \par}
+        {\huge\bfseries\sffamily \thetitle \par}
         \par\vspace{1cm}
         {\Large\itshape \theauthor \par}
 
@@ -100,8 +103,8 @@ Heather Taylor, Tanisha Servet
     \input{chapters/3-algorithm-description.tex}
     \input{chapters/4-experimental-setup.tex}
     \input{chapters/5-results.tex}
-    \input{chapters/6-discussion.tex}
-    \input{chapters/7-conclusion.tex}
+    \input{chapters/6-analysis.tex}
+    \input{chapters/7-discussion.tex}
 
     \begin{appendices}
         \chapter{References}
