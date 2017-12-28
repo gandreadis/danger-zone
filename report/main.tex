@@ -11,7 +11,7 @@
 % Chapter titles
 \titleformat{\chapter}
 {\Huge\bfseries\normalfont\sffamily}{\thechapter}{1em}{}
-\titlespacing*{\chapter}{0pt}{5ex}{2.3ex plus .2ex}
+\titlespacing*{\chapter}{0pt}{3ex}{2.3ex plus .2ex}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -20,14 +20,13 @@
 % Hyperlinks
 \usepackage[hidelinks]{hyperref}
 
-% For notes on what we still need to do - add as many (or little) as you like
-\usepackage[prependcaption]{todonotes}
-\newcommand{\TODO}{\todo[inline]}
-
 % Appendices
 \usepackage[toc,page]{appendix}
 \usepackage[backend=bibtex8,style=ieee]{biblatex}
 \bibliography{bibliography.bib}
+
+% Images
+\usepackage{graphicx}
 
 % Framed boxes
 \usepackage{framed}
@@ -74,6 +73,8 @@ Heather Taylor, Tanisha Servet
 }
 \date{\today}
 
+\setcounter{tocdepth}{1}
+
 
 \begin{document}
 
@@ -93,8 +94,6 @@ Heather Taylor, Tanisha Servet
 
         {\large \thedate \par}
     \end{titlepage}
-
-    \listoftodos
 
     \input{chapters/0-abstract.tex}
     \tableofcontents
